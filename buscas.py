@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict, Set
+import heapq
+import itertools
+import math
 
 Estado = Tuple[int, int]
 
@@ -90,10 +93,8 @@ class LabirintoBusca:
 
         return resultado
 
-    def h(self, estado: Estado) -> float:
-        return abs(estado[0] - self.objetivo[0]) + abs(
-            estado[1] - self.objetivo[1]
-        )
+    def heuristica(self, estado: Estado) -> float:
+        return abs(estado[0] - self.objetivo[0]) + abs(estado[1] - self.objetivo[1])
 
     @staticmethod
     def reconstruir(no: No):
@@ -111,3 +112,54 @@ class LabirintoBusca:
         acoes.reverse()
 
         return estados, acoes
+
+    def busca_gulosa(self) -> ResultadoBusca:
+        return self._busca_prioridade(
+            'Greedy Best-First Search',
+            lambda no: self.heuristica(no.estado)
+        )
+
+    def busca_a_estrela(self) -> ResultadoBusca:
+        return self._busca_prioridade(
+            'A*',
+            lambda no: no.g + self.heuristica(no.estado)
+        )
+
+
+    def _busca_prioridade(self, nome: str, funcao_prioridade) -> ResultadoBusca:
+        contador = itertools.count()
+        inicio = No(self.inicio, g=0.0)
+        fronteira = []
+        heapq.heappush(fronteira, (funcao_prioridade(inicio), next(contador), inicio))
+        melhor_g: Dict[Estado, float] = {self.inicio: 0.0}
+        fechados: Set[Estado] = set()
+        ordem_explorados: List[Estado] = []
+        nos_explorados = 0
+        nos_expandidos = 0
+
+        while fronteira:
+            _, _, no = heapq.heappop(fronteira)
+
+            if no.estado in fechados:
+                continue
+
+            nos_explorados += 1
+            ordem_explorados.append(no.estado)
+
+            if no.estado == self.objetivo:
+                caminho, acoes = self.reconstruir(no)
+                return ResultadoBusca(nome, True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados)
+
+            fechados.add(no.estado)
+            nos_expandidos += 1
+
+            for acao, estado, custo in self.vizinhos(no.estado):
+                novo_g = no.g + custo
+                if estado in fechados:
+                    continue
+                if novo_g < melhor_g.get(estado, math.inf):
+                    filho = No(estado=estado, pai=no, acao=acao, g=novo_g)
+                    melhor_g[estado] = novo_g
+                    heapq.heappush(fronteira, (funcao_prioridade(filho), next(contador), filho))
+
+        return ResultadoBusca(nome, False, [], [], nos_explorados, nos_expandidos, ordem_explorados)
