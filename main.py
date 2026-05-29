@@ -1,5 +1,6 @@
 from pathlib import Path
-from buscas import LabirintoBusca
+from buscas import LabirintoBusca, ResultadoBusca
+from typing import Optional
 
 MAPAS = {
     "1": {
@@ -29,6 +30,39 @@ def escolher_mapa():
 
     return MAPAS[opcao]
 
+def escolher_algoritmo(): 
+    print("Selecione o algoritmo de busca:")
+    print("1 - Busca em Profundidade (DFS)")
+    print("2 - Busca em Largura (BFS)")
+    print("3 - Busca Uniforme (UCS)")
+    print("4 - Busca Gulosa (Greedy Best-First Search)")
+    print("5 - A*")
+
+    opcao = input("Opção: ").strip()
+    return opcao
+
+def imprimir_labirinto(lab: LabirintoBusca, resultado: Optional[ResultadoBusca] = None, mostrar_explorados: bool = True):
+    caminho = set(resultado.caminho) if resultado and resultado.encontrado else set()
+    explorados = set(resultado.estados_explorados) if resultado and mostrar_explorados else set()
+
+    print()
+    for i in range(lab.altura):
+        for j in range(lab.largura):
+            estado = (i, j)
+            if lab.paredes[i][j]:
+                print('█', end='')
+            elif estado == lab.inicio:
+                print('A', end='')
+            elif estado == lab.objetivo:
+                print('B', end='')
+            elif estado in caminho:
+                print('*', end='')
+            elif estado in explorados:
+                print('.', end='')
+            else:
+                print(' ', end='')
+        print()
+    print()
 
 def main():
     mapa_escolhido = escolher_mapa()
@@ -56,7 +90,38 @@ def main():
     print("\nVizinhos do início:")
     print(labirinto.vizinhos(labirinto.inicio))
 
-    print("\nHeurística do início até o objetivo:", labirinto.h(labirinto.inicio))
+    print("\nHeurística do início até o objetivo:", labirinto.heuristica(labirinto.inicio))
+
+    opcao = escolher_algoritmo()
+    match opcao:
+        case '1':
+            # a implementar
+            return
+        case '2':
+            # a implementar
+            return
+
+        case '3':
+        # a implementar
+            return
+
+        case '4':
+        # a implementar
+            resultado = labirinto.busca_gulosa()
+        case '5':
+            # a implementar
+            resultado = labirinto.busca_a_estrela()
+            print('aqui tbmmm')
+        case _:
+            print('Opção inválida!')
+            return
+    
+    print('\nSolução encontrada no labirinto:')
+    if(resultado is not None):
+        imprimir_labirinto(labirinto, resultado=resultado, mostrar_explorados=True)
+    else:
+        print('Não foi encontrado nenhum resultado!')
+    print(' fim do programa!')
 
 
 if __name__ == "__main__":
