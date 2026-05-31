@@ -50,15 +50,15 @@ def imprimir_labirinto(lab: LabirintoBusca, resultado: Optional[ResultadoBusca] 
         for j in range(lab.largura):
             estado = (i, j)
             if lab.paredes[i][j]:
-                print('█', end='')
+                print('#', end='')
             elif estado == lab.inicio:
                 print('A', end='')
             elif estado == lab.objetivo:
                 print('B', end='')
             elif estado in caminho:
-                print('*', end='')
+                print('█', end='')
             elif estado in explorados:
-                print('.', end='')
+                print('░', end='')
             else:
                 print(' ', end='')
         print()
@@ -92,37 +92,55 @@ def main():
 
     print("\nHeurística do início até o objetivo:", labirinto.heuristica(labirinto.inicio))
 
-    opcao = escolher_algoritmo()
-    match opcao:
-        case '1':
-            # a implementar
-            return
-        case '2':
-            # a implementar
-            return
+    while True:
+        opcao = escolher_algoritmo()
 
-        case '3':
-        # a implementar
-            return
+        match opcao:
+            case '1':
+                resultado = labirinto.DFS()
 
-        case '4':
-        # a implementar
-            resultado = labirinto.busca_gulosa()
-        case '5':
-            # a implementar
-            resultado = labirinto.busca_a_estrela()
-            print('aqui tbmmm')
-        case _:
-            print('Opção inválida!')
-            return
-    
-    print('\nSolução encontrada no labirinto:')
-    if(resultado is not None):
-        imprimir_labirinto(labirinto, resultado=resultado, mostrar_explorados=True)
-    else:
-        print('Não foi encontrado nenhum resultado!')
-    print(' fim do programa!')
+            case '2':
+                resultado = labirinto.BFS()
 
+            case '3':
+                resultado = labirinto.UCS()
+
+            case '4':
+                resultado = labirinto.busca_gulosa()
+
+            case '5':
+                resultado = labirinto.busca_a_estrela()
+
+            case _:
+                print('Opção inválida!')
+                continue
+
+        print('\nResultado da busca:')
+
+        if resultado is not None and resultado.encontrado:
+            print(f"\nAlgoritmo: {resultado.algoritmo}")
+
+            print("\nCaminho encontrado:")
+            print(resultado.caminho)
+
+            print("\nAções realizadas:")
+            print(resultado.acoes)
+
+            print(f"\nTamanho do caminho: {resultado.tamanho_caminho}")
+            print(f"Nós explorados: {resultado.nos_explorados}")
+            print(f"Nós expandidos: {resultado.nos_expandidos}")
+
+            print("\nMapa com rota:")
+            imprimir_labirinto(labirinto, resultado=resultado, mostrar_explorados=True)
+
+        else:
+            print('Não foi encontrado nenhum resultado!')
+
+        continuar = input("\nDeseja testar outra busca neste mesmo mapa? (s/n): ").strip().lower()
+
+        if continuar != 's':
+            print("Encerrando...")
+            break
 
 if __name__ == "__main__":
     main()

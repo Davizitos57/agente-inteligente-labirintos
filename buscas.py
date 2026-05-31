@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+from collections import deque
 from typing import Optional, Tuple, List, Dict, Set
 import heapq
 import itertools
@@ -96,22 +97,31 @@ class LabirintoBusca:
     def heuristica(self, estado: Estado) -> float:
         return abs(estado[0] - self.objetivo[0]) + abs(estado[1] - self.objetivo[1])
 
-    @staticmethod
-    def reconstruir(no: No):
+    @staticmethod   
+    def reconstruirCaminho(no: No):
         estados = []
         acoes = []
 
         atual = no
 
-        while atual.pai is not None:
+        while atual is not None:
             estados.append(atual.estado)
-            acoes.append(atual.acao)
+
+            if atual.acao is not None:
+                acoes.append(atual.acao)
+
             atual = atual.pai
 
         estados.reverse()
         acoes.reverse()
 
         return estados, acoes
+    
+    def UCS(self) -> ResultadoBusca:
+        return self._busca_prioridade(
+            'Busca de Custo Uniforme (UCS)',
+            lambda no: no.g
+        ) 
 
     def busca_gulosa(self) -> ResultadoBusca:
         return self._busca_prioridade(
@@ -124,7 +134,66 @@ class LabirintoBusca:
             'A*',
             lambda no: no.g + self.heuristica(no.estado)
         )
+    
+    def BFS(self) -> ResultadoBusca:
+        inicio = No(self.inicio)
+        fronteira = deque([inicio])
+        em_fronteira = {self.inicio}
+        explorados: Set[Estado] = set()
+        ordem_explorados: List[Estado] = []
+        nos_explorados = 0
+        nos_expandidos = 0
 
+        while fronteira:
+            no = fronteira.popleft()
+            em_fronteira.remove(no.estado)
+            nos_explorados += 1
+            ordem_explorados.append(no.estado)
+
+            if no.estado == self.objetivo:
+                caminho, acoes = self.reconstruirCaminho(no)
+                return ResultadoBusca('Busca em Largura (BFS)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados)
+
+            explorados.add(no.estado)
+            nos_expandidos += 1
+
+            for acao, estado, custo in self.vizinhos(no.estado):
+                if estado not in explorados and estado not in em_fronteira:
+                    filho = No(estado=estado, pai=no, acao=acao, g=no.g + custo)
+                    fronteira.append(filho)
+                    em_fronteira.add(estado)
+
+        return ResultadoBusca('Busca em Largura (BFS)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados)
+
+    def DFS(self) -> ResultadoBusca:
+        inicio = No(self.inicio)
+        fronteira = [inicio]
+        em_fronteira = {self.inicio}
+        explorados: Set[Estado] = set()
+        ordem_explorados: List[Estado] = []
+        nos_explorados = 0
+        nos_expandidos = 0
+
+        while fronteira:
+            no = fronteira.pop()
+            em_fronteira.remove(no.estado)
+            nos_explorados += 1
+            ordem_explorados.append(no.estado)
+
+            if no.estado == self.objetivo:
+                caminho, acoes = self.reconstruirCaminho(no)
+                return ResultadoBusca('Busca em Profundidade (DFS)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados)
+
+            explorados.add(no.estado)
+            nos_expandidos += 1
+
+            for acao, estado, custo in self.vizinhos(no.estado):
+                if estado not in explorados and estado not in em_fronteira:
+                    filho = No(estado=estado, pai=no, acao=acao, g=no.g + custo)
+                    fronteira.append(filho)
+                    em_fronteira.add(estado)
+
+        return ResultadoBusca('Busca em Profundidade (DFS)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados)
 
     def _busca_prioridade(self, nome: str, funcao_prioridade) -> ResultadoBusca:
         contador = itertools.count()
@@ -147,7 +216,7 @@ class LabirintoBusca:
             ordem_explorados.append(no.estado)
 
             if no.estado == self.objetivo:
-                caminho, acoes = self.reconstruir(no)
+                caminho, acoes = self.reconstruirCaminho(no)
                 return ResultadoBusca(nome, True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados)
 
             fechados.add(no.estado)
