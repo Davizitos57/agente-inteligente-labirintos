@@ -5,6 +5,7 @@ from typing import Optional, Tuple, List, Dict, Set
 import heapq
 import itertools
 import math
+import time
 
 Estado = Tuple[int, int]
 
@@ -24,6 +25,8 @@ class ResultadoBusca:
     nos_explorados: int
     nos_expandidos: int
     estados_explorados: List[Estado]
+    tempo_execucao: any
+    tamanho_fronteira: int
 
     @property
     def tamanho_caminho(self) -> Optional[int]:
@@ -196,6 +199,7 @@ class LabirintoBusca:
         return ResultadoBusca('Busca em Profundidade (DFS)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados)
 
     def _busca_prioridade(self, nome: str, funcao_prioridade) -> ResultadoBusca:
+        inicio_temp = time.time()
         contador = itertools.count()
         inicio = No(self.inicio, g=0.0)
         fronteira = []
@@ -217,7 +221,9 @@ class LabirintoBusca:
 
             if no.estado == self.objetivo:
                 caminho, acoes = self.reconstruirCaminho(no)
-                return ResultadoBusca(nome, True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados)
+                fim_temp = time.time()
+                tempo_execucao = fim_temp - inicio_temp
+                return ResultadoBusca(nome, True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira))
 
             fechados.add(no.estado)
             nos_expandidos += 1
@@ -231,4 +237,6 @@ class LabirintoBusca:
                     melhor_g[estado] = novo_g
                     heapq.heappush(fronteira, (funcao_prioridade(filho), next(contador), filho))
 
-        return ResultadoBusca(nome, False, [], [], nos_explorados, nos_expandidos, ordem_explorados)
+        fim_temp = time.time()
+        tempo_execucao = fim_temp - inicio_temp
+        return ResultadoBusca(nome, False, [], [], nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira))

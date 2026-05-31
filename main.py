@@ -64,6 +64,15 @@ def imprimir_labirinto(lab: LabirintoBusca, resultado: Optional[ResultadoBusca] 
         print()
     print()
 
+def imprimir_metricas(resultado: ResultadoBusca):
+    print(f'   - Algoritmo executado: {resultado.algoritmo}')
+    print(f'   - Solução encontrada: {"sim" if resultado.encontrado else "não"}')
+    print(f'   - Nós explorados: {resultado.nos_explorados}')
+    print(f'   - Nós expandidos: {resultado.nos_expandidos}')
+    print(f'   - Tamanho do caminho encontrado: {resultado.tamanho_caminho}')
+    print(f'   - Tempo de execução: {resultado.tempo_execucao:.4f}')
+    print(f'   - Tamanho máximo da fronteira: {resultado.tamanho_fronteira}')
+
 def main():
     mapa_escolhido = escolher_mapa()
 
@@ -98,43 +107,21 @@ def main():
         match opcao:
             case '1':
                 resultado = labirinto.DFS()
-
             case '2':
                 resultado = labirinto.BFS()
-
             case '3':
                 resultado = labirinto.UCS()
-
             case '4':
                 resultado = labirinto.busca_gulosa()
-
             case '5':
                 resultado = labirinto.busca_a_estrela()
-
             case _:
                 print('Opção inválida!')
                 continue
 
         print('\nResultado da busca:')
-
-        if resultado is not None and resultado.encontrado:
-            print(f"\nAlgoritmo: {resultado.algoritmo}")
-
-            print("\nCaminho encontrado:")
-            print(resultado.caminho)
-
-            print("\nAções realizadas:")
-            print(resultado.acoes)
-
-            print(f"\nTamanho do caminho: {resultado.tamanho_caminho}")
-            print(f"Nós explorados: {resultado.nos_explorados}")
-            print(f"Nós expandidos: {resultado.nos_expandidos}")
-
-            print("\nMapa com rota:")
-            imprimir_labirinto(labirinto, resultado=resultado, mostrar_explorados=True)
-
-        else:
-            print('Não foi encontrado nenhum resultado!')
+        imprimir_labirinto(labirinto, resultado=resultado, mostrar_explorados=True)
+        imprimir_metricas(resultado)
 
         continuar = input("\nDeseja testar outra busca neste mesmo mapa? (s/n): ").strip().lower()
 
