@@ -5,20 +5,23 @@ from typing import Optional
 MAPAS = {
     "1": {
         "nome": "Pequeno",
-        "arquivo": "labirinto_pequeno.txt"
+        "uniforme": "labirinto_pequeno_uniforme.txt",
+        "variado": "labirinto_pequeno_custos_variados.txt"
     },
     "2": {
         "nome": "Médio",
-        "arquivo": "labirinto_medio.txt"
+        "uniforme": "labirinto_medio_uniforme.txt",
+        "variado": "labirinto_medio_custos_variados.txt"
     },
     "3": {
         "nome": "Grande",
-        "arquivo": "labirinto_grande.txt"
+        "uniforme": "labirinto_grande_uniforme.txt",
+        "variado": "labirinto_grande_custos_variados.txt"
     }
 }
 
 def escolher_mapa():
-    print("Selecione o mapa:")
+    print("\nSelecione o mapa:")
     print("1 - Pequeno")
     print("2 - Médio")
     print("3 - Grande")
@@ -30,7 +33,20 @@ def escolher_mapa():
 
     return MAPAS[opcao]
 
+def escolher_tipo_custo():
+    print("\nSelecione o tipo de custo:")
+    print("1 - Custo uniforme")
+    print("2 - Custo variado")
+
+    opcao = input("Opção: " ).strip()
+
+    if opcao not in ["1", "2"]:
+        raise ValueError("Opção inválida. Escolha 1 ou 2.")
+    
+    return opcao == "2"
+
 def escolher_algoritmo(): 
+    print("\n------------------------------------------------------\n")
     print("Selecione o algoritmo de busca:")
     print("1 - Busca em Profundidade (DFS)")
     print("2 - Busca em Largura (BFS)")
@@ -65,27 +81,41 @@ def imprimir_labirinto(lab: LabirintoBusca, resultado: Optional[ResultadoBusca] 
     print()
 
 def imprimir_metricas(resultado: ResultadoBusca):
-    print(f'   - Algoritmo executado: {resultado.algoritmo}')
-    print(f'   - Solução encontrada: {"sim" if resultado.encontrado else "não"}')
-    print(f'   - Nós explorados: {resultado.nos_explorados}')
-    print(f'   - Nós expandidos: {resultado.nos_expandidos}')
-    print(f'   - Tamanho do caminho encontrado: {resultado.tamanho_caminho}')
-    print(f'   - Tempo de execução: {resultado.tempo_execucao:.4f}')
-    print(f'   - Tamanho máximo da fronteira: {resultado.tamanho_fronteira}')
+    print("\n------------------------------------------------------\n")
+    print(f'Resultados obtidos:\n')
+    print(f'Algoritmo executado: {resultado.algoritmo}')
+    print(f'Solução encontrada: {"sim" if resultado.encontrado else "não"}')
+    print(f'Nós explorados: {resultado.nos_explorados}')
+    print(f'Nós expandidos: {resultado.nos_expandidos}')
+    print(f'Tamanho do caminho encontrado: {resultado.tamanho_caminho}')
+    print(f'Custo total do caminho: {resultado.custo_total}')
+    print(f'Tempo de execução: {resultado.tempo_execucao:.4f}')
+    print(f'Tamanho máximo da fronteira: {resultado.tamanho_fronteira}')
 
 def main():
     mapa_escolhido = escolher_mapa()
+    usar_custo_variado = escolher_tipo_custo()
 
-    nome_arquivo_labirinto = Path("mapas") / mapa_escolhido["arquivo"]
+    arquivo_mapa = mapa_escolhido["variado"] if usar_custo_variado else mapa_escolhido["uniforme"]
+
+    nome_arquivo_labirinto = Path("mapas") / arquivo_mapa
 
     if not nome_arquivo_labirinto.exists():
         raise FileNotFoundError(
             f"Arquivo não encontrado: {nome_arquivo_labirinto}"
         )
 
-    labirinto = LabirintoBusca(nome_arquivo_labirinto)
+    labirinto = LabirintoBusca(
+        nome_arquivo_labirinto,
+        usar_custo_variado = usar_custo_variado
+    )
 
-    print(f"\nMapa carregado: {mapa_escolhido['nome']}")
+    print("\nCustos dos vizinhos do início:")
+    for acao, estado, custo in labirinto.vizinhos(labirinto.inicio):
+        print(f"{acao} -> {estado} | custo: {custo}")
+
+    print("\n------------------------------------------------------\n")
+    print(f"Mapa carregado: {mapa_escolhido['nome']}")
     print(f"Arquivo: {nome_arquivo_labirinto}")
 
     print("\nLabirinto:")

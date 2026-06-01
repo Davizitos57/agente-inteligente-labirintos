@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from collections import deque
-from typing import Optional, Tuple, List, Dict, Set
+from typing import Any, Optional, Tuple, List, Dict, Set
 import heapq
 import itertools
 import math
@@ -25,15 +25,28 @@ class ResultadoBusca:
     nos_explorados: int
     nos_expandidos: int
     estados_explorados: List[Estado]
-    tempo_execucao: any
+    tempo_execucao: Any
     tamanho_fronteira: int
+    custo_total: float = 0.0
 
     @property
     def tamanho_caminho(self) -> Optional[int]:
         return len(self.acoes) if self.encontrado else None
 
 class LabirintoBusca:
-    def __init__(self, filename: str | Path):
+    CUSTOS_VARIADOS = {
+        " ": 1.0,
+        ".": 1.0,
+        "*": 2.0,
+        "~": 3.0,
+        "^": 5.0,
+        "A": 1.0,
+        "B": 1.0,
+    }
+        
+    def __init__(self, filename: str | Path, usar_custo_variado: bool = False):
+        self.usar_custo_variado = usar_custo_variado
+
         with open(filename, encoding="utf-8") as f:
             contents = f.read()
 
@@ -64,11 +77,14 @@ class LabirintoBusca:
                     self.objetivo = (i, j)
                     row.append(False)
 
-                elif char == " ":
+                elif char == "#":
+                    row.append(True)
+
+                elif char in self.CUSTOS_VARIADOS:
                     row.append(False)
 
                 else:
-                    row.append(True)
+                    raise ValueError(f"Caractere inválido no labirinto: {char!r}")
 
             self.paredes.append(row)
 
@@ -76,14 +92,23 @@ class LabirintoBusca:
         for linha in self.linhas:
             print(linha)
 
+    def custo_terreno(self, estado: Estado) -> float:
+        linha, coluna = estado
+        simbolo = self.linhas[linha][coluna] if coluna < len(self.linhas[linha]) else " "
+
+        if not self.usar_custo_variado:
+            return 1.0
+
+        return self.CUSTOS_VARIADOS.get(simbolo, 1.0)
+
     def vizinhos(self, estado: Estado):
         linha, coluna = estado
 
         candidatos = [
-            ("up", (linha - 1, coluna)),
-            ("down", (linha + 1, coluna)),
-            ("left", (linha, coluna - 1)),
-            ("right", (linha, coluna + 1)),
+            ("cima", (linha - 1, coluna)),
+            ("baixo", (linha + 1, coluna)),
+            ("esquerda", (linha, coluna - 1)),
+            ("direita", (linha, coluna + 1)),
         ]
 
         resultado = []
@@ -93,7 +118,8 @@ class LabirintoBusca:
             dentro_da_largura = 0 <= c < self.largura
 
             if dentro_da_altura and dentro_da_largura and not self.paredes[l][c]:
-                resultado.append((acao, (l, c), 1.0))
+                custo = self.custo_terreno((l, c))
+                resultado.append((acao, (l, c), custo))
 
         return resultado
 
@@ -139,6 +165,7 @@ class LabirintoBusca:
         )
     
     def BFS(self) -> ResultadoBusca:
+        inicio_temp = time.time()
         inicio = No(self.inicio)
         fronteira = deque([inicio])
         em_fronteira = {self.inicio}
@@ -155,7 +182,11 @@ class LabirintoBusca:
 
             if no.estado == self.objetivo:
                 caminho, acoes = self.reconstruirCaminho(no)
-                return ResultadoBusca('Busca em Largura (BFS)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados)
+
+                fim_temp = time.time()
+                tempo_execucao = fim_temp - inicio_temp
+
+                return ResultadoBusca('Busca em Largura (BFS)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira), no.g)
 
             explorados.add(no.estado)
             nos_expandidos += 1
@@ -166,9 +197,13 @@ class LabirintoBusca:
                     fronteira.append(filho)
                     em_fronteira.add(estado)
 
-        return ResultadoBusca('Busca em Largura (BFS)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados)
+        fim_temp = time.time()
+        tempo_execucao = fim_temp - inicio_temp
+
+        return ResultadoBusca('Busca em Largura (BFS)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira))
 
     def DFS(self) -> ResultadoBusca:
+        inicio_temp = time.time()
         inicio = No(self.inicio)
         fronteira = [inicio]
         em_fronteira = {self.inicio}
@@ -185,7 +220,9 @@ class LabirintoBusca:
 
             if no.estado == self.objetivo:
                 caminho, acoes = self.reconstruirCaminho(no)
-                return ResultadoBusca('Busca em Profundidade (DFS)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados)
+                fim_temp = time.time()
+                tempo_execucao = fim_temp - inicio_temp
+                return ResultadoBusca('Busca em Profundidade (DFS)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira), no.g)
 
             explorados.add(no.estado)
             nos_expandidos += 1
@@ -195,8 +232,10 @@ class LabirintoBusca:
                     filho = No(estado=estado, pai=no, acao=acao, g=no.g + custo)
                     fronteira.append(filho)
                     em_fronteira.add(estado)
-
-        return ResultadoBusca('Busca em Profundidade (DFS)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados)
+        
+        fim_temp = time.time()
+        tempo_execucao = fim_temp - inicio_temp
+        return ResultadoBusca('Busca em Profundidade (DFS)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira))
 
     def _busca_prioridade(self, nome: str, funcao_prioridade) -> ResultadoBusca:
         inicio_temp = time.time()
@@ -223,7 +262,7 @@ class LabirintoBusca:
                 caminho, acoes = self.reconstruirCaminho(no)
                 fim_temp = time.time()
                 tempo_execucao = fim_temp - inicio_temp
-                return ResultadoBusca(nome, True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira))
+                return ResultadoBusca(nome, True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira), no.g)
 
             fechados.add(no.estado)
             nos_expandidos += 1
