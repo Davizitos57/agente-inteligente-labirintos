@@ -43,6 +43,17 @@ class LabirintoBusca:
         "A": 1.0,
         "B": 1.0,
     }
+    
+    CUSTOS_COLETAS = {
+        " ": 1.0,
+        ".": 1.0,
+        "*": 2.0,
+        "~": 3.0,
+        "^": 5.0,
+        "A": 1.0,
+        "B": 1.0,
+        "C": 1.0,
+    }
         
     def __init__(self, filename: str | Path, usar_custo_variado: bool = False):
         self.usar_custo_variado = usar_custo_variado
@@ -62,6 +73,7 @@ class LabirintoBusca:
         self.altura = len(linhas)
         self.largura = max(len(linha) for linha in linhas)
         self.paredes = []
+        self.coletas = []
 
         for i in range(self.altura):
             row = []
@@ -77,10 +89,17 @@ class LabirintoBusca:
                     self.objetivo = (i, j)
                     row.append(False)
 
+                elif char == "C":
+                    self.coletas.append((i, j))
+                    row.append(False)
+
                 elif char == "#":
                     row.append(True)
 
                 elif char in self.CUSTOS_VARIADOS:
+                    row.append(False)
+                
+                elif char in self.CUSTOS_COLETAS:
                     row.append(False)
 
                 else:
@@ -91,6 +110,27 @@ class LabirintoBusca:
     def mostrar(self):
         for linha in self.linhas:
             print(linha)
+    
+    def mostrar_coletas(self):
+        if not self.coletas:
+            print("Nenhum ponto de coleta encontrado")
+            return
+        print("\nPontos de coleta encontrados:")
+
+        for indice, coleta in enumerate(self.coletas, start=1):
+            print(f"C{indice}:{coleta}")
+        
+    def mostrar_ordem_coletas(self, ordem: List[Estado]):
+        if not ordem:
+            print("Nenhuma ordem de coleta disponível")
+            return
+        print("\nOrdem inicial de visitação:")
+        print(f"A {self.inicio}")
+
+        for indice, coleta in enumerate(ordem, start=1):
+            print(f"C{indice} {coleta}")
+
+        print(f"B {self.objetivo}")
 
     def custo_terreno(self, estado: Estado) -> float:
         linha, coluna = estado
@@ -279,3 +319,6 @@ class LabirintoBusca:
         fim_temp = time.time()
         tempo_execucao = fim_temp - inicio_temp
         return ResultadoBusca(nome, False, [], [], nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, len(fronteira))
+    
+    def ordem_inicial_coletas(self) -> List[Estado]:
+        return self.coletas.copy()

@@ -6,17 +6,20 @@ MAPAS = {
     "1": {
         "nome": "Pequeno",
         "uniforme": "labirinto_pequeno_uniforme.txt",
-        "variado": "labirinto_pequeno_custos_variados.txt"
+        "variado": "labirinto_pequeno_custos_variados.txt",
+        "coleta": "labirinto_pequeno_com_coletas.txt"
     },
     "2": {
         "nome": "Médio",
         "uniforme": "labirinto_medio_uniforme.txt",
-        "variado": "labirinto_medio_custos_variados.txt"
+        "variado": "labirinto_medio_custos_variados.txt",
+        "coleta": "labirinto_medio_com_coletas.txt"
     },
     "3": {
         "nome": "Grande",
         "uniforme": "labirinto_grande_uniforme.txt",
-        "variado": "labirinto_grande_custos_variados.txt"
+        "variado": "labirinto_grande_custos_variados.txt",
+        "coleta": "labirinto_grande_com_coletas.txt"
     }
 }
 
@@ -33,17 +36,18 @@ def escolher_mapa():
 
     return MAPAS[opcao]
 
-def escolher_tipo_custo():
-    print("\nSelecione o tipo de custo:")
-    print("1 - Custo uniforme")
-    print("2 - Custo variado")
+def escolher_tipo_mapa():
+    print("\nSelecione o tipo de mapas:")
+    print("1 - Mapa com custo uniforme")
+    print("2 - Mapa com custo variado")
+    print("3 - Mapa com pontos de coleta")
 
     opcao = input("Opção: " ).strip()
 
-    if opcao not in ["1", "2"]:
-        raise ValueError("Opção inválida. Escolha 1 ou 2.")
+    if opcao not in ["1", "2", "3"]:
+        raise ValueError("Opção inválida. Escolha 1, 2 ou 3.")
     
-    return opcao == "2"
+    return opcao
 
 def escolher_algoritmo(): 
     print("\n------------------------------------------------------\n")
@@ -94,9 +98,22 @@ def imprimir_metricas(resultado: ResultadoBusca):
 
 def main():
     mapa_escolhido = escolher_mapa()
-    usar_custo_variado = escolher_tipo_custo()
+    tipo_mapa = escolher_tipo_mapa()
 
-    arquivo_mapa = mapa_escolhido["variado"] if usar_custo_variado else mapa_escolhido["uniforme"]
+    if tipo_mapa == "1":
+        arquivo_mapa = mapa_escolhido["uniforme"]
+        usar_custo_variado = False
+        mapa_com_coletas = False
+
+    elif tipo_mapa == "2":
+        arquivo_mapa = mapa_escolhido["variado"]
+        usar_custo_variado = True
+        mapa_com_coletas = False
+
+    else:
+        arquivo_mapa = mapa_escolhido["coleta"]
+        usar_custo_variado = True
+        mapa_com_coletas = True
 
     nome_arquivo_labirinto = Path("mapas") / arquivo_mapa
 
@@ -130,6 +147,18 @@ def main():
     print(labirinto.vizinhos(labirinto.inicio))
 
     print("\nHeurística do início até o objetivo:", labirinto.heuristica(labirinto.inicio))
+
+    if mapa_com_coletas:
+        print(f"\nMapa com coletas carregado: {mapa_escolhido['nome']}")
+        print(f"Arquivo: {nome_arquivo_labirinto}")
+
+        print("\nLabirinto:")
+        labirinto.mostrar_coletas()
+
+        ordem = labirinto.ordem_inicial_coletas()
+        labirinto.mostrar_ordem_coletas(ordem)
+
+        return
 
     while True:
         opcao = escolher_algoritmo()
