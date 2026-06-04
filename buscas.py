@@ -366,3 +366,45 @@ class LabirintoBusca:
                                            )
         return resultado
     
+    def hill_climbing(self) -> ResultadoBusca:
+            inicio_temp = time.time()
+            atual = No(self.inicio)
+            
+            nos_explorados = 1
+            nos_expandidos = 0
+            ordem_explorados = [atual.estado]
+            
+            while True:
+                if atual.estado == self.objetivo:
+                    caminho, acoes = self.reconstruirCaminho(atual)
+                    tempo_execucao = time.time() - inicio_temp
+                    return ResultadoBusca('Subida de Encosta (Hill Climbing)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, 1, atual.g)
+                
+                nos_expandidos += 1
+                vizinhos = self.vizinhos(atual.estado)
+                
+                if not vizinhos:
+                    break
+                    
+                melhor_vizinho = None
+                # Inicializamos com a heurística atual. Qualquer vizinho precisará ser ESTRITAMENTE menor que isso.
+                melhor_h = self.heuristica(atual.estado)
+                
+                for acao, estado, custo in vizinhos:
+                    h = self.heuristica(estado)
+                    
+                    # Exige melhoria estrita (<) para seguir a regra "se não melhora, retorne"
+                    if h < melhor_h:
+                        melhor_h = h
+                        melhor_vizinho = No(estado=estado, pai=atual, acao=acao, g=atual.g + custo)
+                
+                # Se nenhum vizinho melhorou a heurística atual, o algoritmo para (ótimo local alcançado)
+                if melhor_vizinho is None:
+                    break 
+                    
+                atual = melhor_vizinho
+                nos_explorados += 1
+                ordem_explorados.append(atual.estado)
+                
+            tempo_execucao = time.time() - inicio_temp
+            return ResultadoBusca('Subida de Encosta (Hill Climbing)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, 1, atual.g)

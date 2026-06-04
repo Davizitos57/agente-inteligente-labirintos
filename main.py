@@ -58,6 +58,7 @@ def escolher_algoritmo():
     print("4 - Busca Gulosa (Greedy Best-First Search)")
     print("5 - A*")
     print("6 - Simulated Annealing")
+    print("7 - Hill Climbing")
 
     opcao = input("Opção: ").strip()
     return opcao
@@ -164,6 +165,8 @@ def main():
                 resultado = labirinto.busca_a_estrela()
             case '6': 
                 resultado = labirinto.executar_experimentos_annealing()
+            case '7':
+                resultado = labirinto.hill_climbing()
             case _:
                 print('Opção inválida!')
                 continue
