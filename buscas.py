@@ -317,6 +317,9 @@ class LabirintoBusca:
         iteracoes = []
         solucoes = []
         caminhos_explorados = []
+        historicos = []
+        taxa_sucesso = 0
+        melhoras_registradas = 0
 
         for _ in range(quantidade_execucoes):
 
@@ -331,14 +334,21 @@ class LabirintoBusca:
             iteracoes.append(resultado["iteracoes"])
             solucoes.append(resultado['melhor_solucao'])
             caminhos_explorados.append(resultado['caminho'])
+            historicos.append(resultado['historico'])
 
+            if resultado["is_taxa_aceitavel"]:
+                taxa_sucesso += 1
+
+            if resultado["houve_melhora"]:
+                melhoras_registradas += 1
 
         melhor_custo = min(melhores_custos)
         indice_melhor = melhores_custos.index(melhor_custo)
         melhor_solucao = solucoes[indice_melhor]
         melhor_caminhos_explorado = caminhos_explorados[indice_melhor]
+        # historico = historicos[indice_melhor]
 
-        return ResultadoSimulatedAnnealing('SIMULATED ANNEALING', 
+        resultado = ResultadoSimulatedAnnealing('SIMULATED ANNEALING', 
                                            encontrado=True,
                                            melhor_custo=min(melhores_custos),
                                            melhor_solucao=melhor_solucao,
@@ -350,6 +360,9 @@ class LabirintoBusca:
                                            temperatura_inicial=sa.temperatura_inicial,
                                            temperatura_final=sa.temperatura_final,
                                            fator_resfriamento=sa.fator_resfriamento,
-                                           caminho=melhor_caminhos_explorado
+                                           caminho=melhor_caminhos_explorado,
+                                            taxa_sucesso=taxa_sucesso / quantidade_execucoes,
+                                            taxa_melhora=melhoras_registradas / quantidade_execucoes
                                            )
+        return resultado
     

@@ -119,9 +119,9 @@ class SimulatedAnnealing:
         temperatura = self.temperatura_inicial
 
         atual = self.gerar_solucao_inicial()
-
         custo_atual, caminho_atual = self.custo(atual)
-
+        custo_inicial = custo_atual
+        
         melhor_solucao = atual.copy()
         melhor_custo = custo_atual
 
@@ -185,7 +185,9 @@ class SimulatedAnnealing:
             "melhor_custo": melhor_custo,
             "media_custo": sum(historico)/ len(historico),
             "pior_custo": max(historico),
+            "historico": historico,
             "iteracoes": iteracoes,
             "tempo_execucao": tempo_execucao,
-            "historico": historico
+            "is_taxa_aceitavel": custo_atual < custo_inicial * 1.1,
+            "houve_melhora": melhor_custo < custo_inicial
         }

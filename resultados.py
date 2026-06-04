@@ -36,6 +36,7 @@ class ResultadoBusca:
 @dataclass
 class ResultadoSimulatedAnnealing(ResultadoBusca):
     
+    # historico: List[float] = field(default_factory=list)
     melhor_custo: float = 0.0
     pior_custo: float = 0.0
     custo_medio: float = 0.0
@@ -47,6 +48,8 @@ class ResultadoSimulatedAnnealing(ResultadoBusca):
     fator_resfriamento: float = 0.0
     quantidade_execucoes: int = 0
     melhor_solucao: Optional[List["Estado"]] = field(default_factory=list)
+    taxa_sucesso: float = 0.0
+    taxa_melhora: float = 0.0
 
     def imprimir_metricas(self):
         print("\n------------------------------------------------------\n")
@@ -62,3 +65,25 @@ class ResultadoSimulatedAnnealing(ResultadoBusca):
         print(f'Custo médio: {self.custo_medio:.4f}')
         print(f'Tempo médio: {self.tempo_medio:.4f}')
         print(f'Iterações médias: {self.iteracoes_medias}')
+        print(f'Taxa de sucesso: {self.taxa_sucesso:.2f}%')
+        print(f'Melhor solução encontrada: {self.melhor_solucao}')
+        print(f'Taxa de melhora: {self.taxa_melhora:.2f}%')
+
+    ##### AINDA A SER IMPLEMENTADO #####
+    #### PS: problemas de configurações da minha máquina
+    # def plotar_convergencia(self):
+
+    #     plt.figure(figsize=(10,5))
+
+    #     plt.plot(self.historico)
+
+    #     plt.xlabel("Iteração")
+    #     plt.ylabel("Melhor custo")
+
+    #     plt.title(
+    #         "Simulated Annealing - Curva de Convergência"
+    #     )
+
+    #     plt.grid(True)
+
+    #     plt.show()
