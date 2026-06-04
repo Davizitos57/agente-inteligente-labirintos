@@ -57,6 +57,7 @@ def escolher_algoritmo():
     print("3 - Busca Uniforme (UCS)")
     print("4 - Busca Gulosa (Greedy Best-First Search)")
     print("5 - A*")
+    print("6 - Simulated Annealing")
 
     opcao = input("Opção: ").strip()
     return opcao
@@ -83,18 +84,6 @@ def imprimir_labirinto(lab: LabirintoBusca, resultado: Optional[ResultadoBusca] 
                 print(' ', end='')
         print()
     print()
-
-def imprimir_metricas(resultado: ResultadoBusca):
-    print("\n------------------------------------------------------\n")
-    print(f'Resultados obtidos:\n')
-    print(f'Algoritmo executado: {resultado.algoritmo}')
-    print(f'Solução encontrada: {"sim" if resultado.encontrado else "não"}')
-    print(f'Nós explorados: {resultado.nos_explorados}')
-    print(f'Nós expandidos: {resultado.nos_expandidos}')
-    print(f'Tamanho do caminho encontrado: {resultado.tamanho_caminho}')
-    print(f'Custo total do caminho: {resultado.custo_total}')
-    print(f'Tempo de execução: {resultado.tempo_execucao:.4f}')
-    print(f'Tamanho máximo da fronteira: {resultado.tamanho_fronteira}')
 
 def main():
     mapa_escolhido = escolher_mapa()
@@ -158,7 +147,6 @@ def main():
         ordem = labirinto.ordem_inicial_coletas()
         labirinto.mostrar_ordem_coletas(ordem)
 
-        return
 
     while True:
         opcao = escolher_algoritmo()
@@ -174,13 +162,15 @@ def main():
                 resultado = labirinto.busca_gulosa()
             case '5':
                 resultado = labirinto.busca_a_estrela()
+            case '6': 
+                resultado = labirinto.executar_experimentos_annealing()
             case _:
                 print('Opção inválida!')
                 continue
 
         print('\nResultado da busca:')
         imprimir_labirinto(labirinto, resultado=resultado, mostrar_explorados=True)
-        imprimir_metricas(resultado)
+        resultado.imprimir_metricas()
 
         continuar = input("\nDeseja testar outra busca neste mesmo mapa? (s/n): ").strip().lower()
 

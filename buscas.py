@@ -1,7 +1,9 @@
-from dataclasses import dataclass
-from pathlib import Path
 from collections import deque
-from typing import Any, Optional, Tuple, List, Dict, Set
+from dataclasses import dataclass
+from resultados import ResultadoBusca, ResultadoSimulatedAnnealing
+from simulated_annealing import SimulatedAnnealing
+from typing import Optional, Tuple, List, Dict, Set
+from pathlib import Path
 import heapq
 import itertools
 import math
@@ -15,23 +17,6 @@ class No:
     pai: Optional["No"] = None
     acao: Optional[str] = None
     g: float = 0.0
-
-@dataclass
-class ResultadoBusca:
-    algoritmo: str
-    encontrado: bool
-    caminho: List[Estado]
-    acoes: List[str]
-    nos_explorados: int
-    nos_expandidos: int
-    estados_explorados: List[Estado]
-    tempo_execucao: Any
-    tamanho_fronteira: int
-    custo_total: float = 0.0
-
-    @property
-    def tamanho_caminho(self) -> Optional[int]:
-        return len(self.acoes) if self.encontrado else None
 
 class LabirintoBusca:
     CUSTOS_VARIADOS = {
@@ -322,3 +307,49 @@ class LabirintoBusca:
     
     def ordem_inicial_coletas(self) -> List[Estado]:
         return self.coletas.copy()
+
+    def executar_experimentos_annealing(self,quantidade_execucoes: int = 10):
+
+        melhores_custos = []
+        piores_custos = []
+        medias_custos = []
+        tempos = []
+        iteracoes = []
+        solucoes = []
+        caminhos_explorados = []
+
+        for _ in range(quantidade_execucoes):
+
+            sa = SimulatedAnnealing(labirinto=self)
+       
+            resultado = sa.executar()
+
+            melhores_custos.append(resultado["melhor_custo"])
+            piores_custos.append(resultado["pior_custo"])
+            medias_custos.append(resultado["media_custo"])
+            tempos.append(resultado["tempo_execucao"])
+            iteracoes.append(resultado["iteracoes"])
+            solucoes.append(resultado['melhor_solucao'])
+            caminhos_explorados.append(resultado['caminho'])
+
+
+        melhor_custo = min(melhores_custos)
+        indice_melhor = melhores_custos.index(melhor_custo)
+        melhor_solucao = solucoes[indice_melhor]
+        melhor_caminhos_explorado = caminhos_explorados[indice_melhor]
+
+        return ResultadoSimulatedAnnealing('SIMULATED ANNEALING', 
+                                           encontrado=True,
+                                           melhor_custo=min(melhores_custos),
+                                           melhor_solucao=melhor_solucao,
+                                           pior_custo=max(piores_custos),
+                                           custo_medio=sum(medias_custos)/len(medias_custos),
+                                           tempo_medio=sum(tempos)/len(tempos),
+                                           iteracoes_medias=sum(iteracoes)/len(iteracoes),
+                                           quantidade_execucoes=quantidade_execucoes,
+                                           temperatura_inicial=sa.temperatura_inicial,
+                                           temperatura_final=sa.temperatura_final,
+                                           fator_resfriamento=sa.fator_resfriamento,
+                                           caminho=melhor_caminhos_explorado
+                                           )
+    
