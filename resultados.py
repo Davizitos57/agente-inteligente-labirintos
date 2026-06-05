@@ -2,7 +2,8 @@ from typing import TYPE_CHECKING, List, Optional, Any
 from dataclasses import dataclass, field
 
 if TYPE_CHECKING:
-    from buscas import Estado
+    from labirinto import Estado
+
     
 @dataclass
 class ResultadoBusca:
@@ -20,7 +21,7 @@ class ResultadoBusca:
     @property
     def tamanho_caminho(self) -> Optional[int]:
         return len(self.acoes) if self.encontrado else None
-    
+
     def imprimir_metricas(self):
         print("\n------------------------------------------------------\n")
         print(f'Resultados obtidos:\n')
@@ -33,16 +34,16 @@ class ResultadoBusca:
         print(f'Tempo de execução: {self.tempo_execucao:.4f}')
         print(f'Tamanho máximo da fronteira: {self.tamanho_fronteira}')
 
+
 @dataclass
 class ResultadoSimulatedAnnealing(ResultadoBusca):
-    
+
     # historico: List[float] = field(default_factory=list)
     melhor_custo: float = 0.0
     pior_custo: float = 0.0
     custo_medio: float = 0.0
     tempo_medio: float = 0.0
     iteracoes_medias: float = 0.0
-    taxa_sucesso: float = 0.0
     temperatura_inicial: float = 0.0
     temperatura_final: float = 0.0
     fator_resfriamento: float = 0.0
@@ -65,9 +66,9 @@ class ResultadoSimulatedAnnealing(ResultadoBusca):
         print(f'Custo médio: {self.custo_medio:.4f}')
         print(f'Tempo médio: {self.tempo_medio:.4f}')
         print(f'Iterações médias: {self.iteracoes_medias}')
-        print(f'Taxa de sucesso: {self.taxa_sucesso:.2f}%')
+        print(f'Taxa de sucesso: {self.taxa_sucesso * 100:.2f}%')
         print(f'Melhor solução encontrada: {self.melhor_solucao}')
-        print(f'Taxa de melhora: {self.taxa_melhora:.2f}%')
+        print(f'Taxa de melhora: {self.taxa_melhora * 100:.2f}%')
 
     ##### AINDA A SER IMPLEMENTADO #####
     #### PS: problemas de configurações da minha máquina
@@ -87,6 +88,7 @@ class ResultadoSimulatedAnnealing(ResultadoBusca):
     #     plt.grid(True)
 
     #     plt.show()
+
 
 @dataclass
 class ResultadoHillClimbing(ResultadoBusca):

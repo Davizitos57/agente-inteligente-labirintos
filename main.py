@@ -1,6 +1,8 @@
+from buscas_locais.experimentos import (executar_experimentos_annealing, executar_experimentos_hill_climbing)
 from pathlib import Path
-from buscas import LabirintoBusca, ResultadoBusca
-from typing import Optional
+from labirinto import LabirintoBusca
+from buscas_classicas.buscas import BuscasClassicas
+from visualizacao import imprimir_labirinto
 
 MAPAS = {
     "1": {
@@ -49,7 +51,7 @@ def escolher_tipo_mapa():
     
     return opcao
 
-def escolher_algoritmo(): 
+def escolher_algoritmo(mapa_com_coletas: bool): 
     print("\n------------------------------------------------------\n")
     print("Selecione o algoritmo de busca:")
     print("1 - Busca em Profundidade (DFS)")
@@ -57,73 +59,48 @@ def escolher_algoritmo():
     print("3 - Busca Uniforme (UCS)")
     print("4 - Busca Gulosa (Greedy Best-First Search)")
     print("5 - A*")
-    print("6 - Simulated Annealing")
-    print("7 - Hill Climbing")
+
+    if mapa_com_coletas:
+        print("6 - Simulated Annealing")
+        print("7 - Hill Climbing")
 
     opcao = input("Opção: ").strip()
     return opcao
 
-def imprimir_labirinto(lab: LabirintoBusca, resultado: Optional[ResultadoBusca] = None, mostrar_explorados: bool = True):
-    caminho = set(resultado.caminho) if resultado and resultado.encontrado else set()
-    explorados = set(resultado.estados_explorados) if resultado and mostrar_explorados else set()
+def obter_configuracao_mapa(mapa_escolhido, tipo_mapa):
+    if tipo_mapa == "1":
+        return mapa_escolhido["uniforme"], False, False
 
-    print()
-    for i in range(lab.altura):
-        for j in range(lab.largura):
-            estado = (i, j)
-            if lab.paredes[i][j]:
-                print('#', end='')
-            elif estado == lab.inicio:
-                print('A', end='')
-            elif estado == lab.objetivo:
-                print('B', end='')
-            elif estado in caminho:
-                print('█', end='')
-            elif estado in explorados:
-                print('░', end='')
-            else:
-                print(' ', end='')
-        print()
-    print()
+    if tipo_mapa == "2":
+        return mapa_escolhido["variado"], True, False
 
-def main():
+    return mapa_escolhido["coleta"], True, True
+
+def carregar_labirinto():
     mapa_escolhido = escolher_mapa()
     tipo_mapa = escolher_tipo_mapa()
 
-    if tipo_mapa == "1":
-        arquivo_mapa = mapa_escolhido["uniforme"]
-        usar_custo_variado = False
-        mapa_com_coletas = False
-
-    elif tipo_mapa == "2":
-        arquivo_mapa = mapa_escolhido["variado"]
-        usar_custo_variado = True
-        mapa_com_coletas = False
-
-    else:
-        arquivo_mapa = mapa_escolhido["coleta"]
-        usar_custo_variado = True
-        mapa_com_coletas = True
-
-    nome_arquivo_labirinto = Path("mapas") / arquivo_mapa
-
-    if not nome_arquivo_labirinto.exists():
-        raise FileNotFoundError(
-            f"Arquivo não encontrado: {nome_arquivo_labirinto}"
-        )
-
-    labirinto = LabirintoBusca(
-        nome_arquivo_labirinto,
-        usar_custo_variado = usar_custo_variado
+    arquivo_mapa, usar_custo_variado, mapa_com_coletas = obter_configuracao_mapa(
+        mapa_escolhido,
+        tipo_mapa
     )
 
-    print("\nCustos dos vizinhos do início:")
-    for acao, estado, custo in labirinto.vizinhos(labirinto.inicio):
-        print(f"{acao} -> {estado} | custo: {custo}")
+    caminho_mapa = Path("mapas") / arquivo_mapa
 
+    if not caminho_mapa.exists():
+        raise FileNotFoundError(f"Arquivo não encontrado: {caminho_mapa}")
+
+    labirinto = LabirintoBusca(
+        caminho_mapa,
+        usar_custo_variado=usar_custo_variado
+    )
+
+    return labirinto, mapa_escolhido, caminho_mapa, mapa_com_coletas
+
+def imprimir_informacoes_labirinto(labirinto, mapa_escolhido, caminho_mapa, mapa_com_coletas):
     print("\n------------------------------------------------------\n")
     print(f"Mapa carregado: {mapa_escolhido['nome']}")
-    print(f"Arquivo: {nome_arquivo_labirinto}")
+    print(f"Arquivo: {caminho_mapa}")
 
     print("\nLabirinto:")
     labirinto.mostrar()
@@ -134,52 +111,81 @@ def main():
     print(f"Largura: {labirinto.largura}")
 
     print("\nVizinhos do início:")
-    print(labirinto.vizinhos(labirinto.inicio))
+    for acao, estado, custo in labirinto.vizinhos(labirinto.inicio):
+        print(f"{acao} -> {estado} | custo: {custo}")
 
     print("\nHeurística do início até o objetivo:", labirinto.heuristica(labirinto.inicio))
 
     if mapa_com_coletas:
-        print(f"\nMapa com coletas carregado: {mapa_escolhido['nome']}")
-        print(f"Arquivo: {nome_arquivo_labirinto}")
-
-        print("\nLabirinto:")
         labirinto.mostrar_coletas()
 
         ordem = labirinto.ordem_inicial_coletas()
         labirinto.mostrar_ordem_coletas(ordem)
 
 
+def executar_algoritmo(opcao, buscador, labirinto, mapa_com_coletas):
+    match opcao:
+        case "1":
+            return buscador.DFS()
+
+        case "2":
+            return buscador.BFS()
+
+        case "3":
+            return buscador.UCS()
+
+        case "4":
+            return buscador.busca_gulosa()
+
+        case "5":
+            return buscador.busca_a_estrela()
+
+        case "6":
+            if not mapa_com_coletas:
+                print("\nOpção disponível apenas para mapas com pontos de coleta.")
+                print("Escolha o tipo de mapa 3 - Mapa com pontos de coleta.")
+                return None
+
+            return executar_experimentos_annealing(labirinto)
+
+        case "7":
+            if not mapa_com_coletas:
+                print("\nOpção disponível apenas para mapas com pontos de coleta.")
+                print("Escolha o tipo de mapa 3 - Mapa com pontos de coleta.")
+                return None
+
+            return executar_experimentos_hill_climbing(labirinto)
+
+        case _:
+            print("Opção inválida!")
+            return None
+
+
+def main():
+    labirinto, mapa_escolhido, caminho_mapa, mapa_com_coletas = carregar_labirinto()
+
+    imprimir_informacoes_labirinto(labirinto, mapa_escolhido, caminho_mapa, mapa_com_coletas)
+
+    buscador = BuscasClassicas(labirinto)
+
     while True:
-        opcao = escolher_algoritmo()
+        opcao = escolher_algoritmo(mapa_com_coletas)
+        resultado = executar_algoritmo(opcao, buscador, labirinto, mapa_com_coletas)
 
-        match opcao:
-            case '1':
-                resultado = labirinto.DFS()
-            case '2':
-                resultado = labirinto.BFS()
-            case '3':
-                resultado = labirinto.UCS()
-            case '4':
-                resultado = labirinto.busca_gulosa()
-            case '5':
-                resultado = labirinto.busca_a_estrela()
-            case '6': 
-                resultado = labirinto.executar_experimentos_annealing()
-            case '7':
-                resultado = labirinto.executar_experimentos_hill_climbing()
-            case _:
-                print('Opção inválida!')
-                continue
+        if resultado is None:
+            continue
 
-        print('\nResultado da busca:')
+        print("\nResultado da busca:")
         imprimir_labirinto(labirinto, resultado=resultado, mostrar_explorados=True)
+
         resultado.imprimir_metricas()
 
         continuar = input("\nDeseja testar outra busca neste mesmo mapa? (s/n): ").strip().lower()
 
-        if continuar != 's':
+        if continuar != "s":
             print("Encerrando...")
             break
+
 
 if __name__ == "__main__":
     main()

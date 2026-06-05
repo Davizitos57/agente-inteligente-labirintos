@@ -2,9 +2,12 @@ import time
 import random
 from typing import List, TYPE_CHECKING
 
+from buscas_classicas.buscas import BuscasClassicas
+
 if TYPE_CHECKING:
-    from buscas import LabirintoBusca
-    from buscas import Estado
+    from labirinto import LabirintoBusca
+    from labirinto import Estado
+
 
 class HillClimbing:
     
@@ -14,6 +17,7 @@ class HillClimbing:
 
     def distancia(self, origem: "Estado", destino: "Estado"):
         par = (origem, destino)
+
         if par in self.distancias:
             return self.distancias[par]
 
@@ -22,7 +26,10 @@ class HillClimbing:
 
         self.labirinto.inicio = origem
         self.labirinto.objetivo = destino
-        resultado = self.labirinto.busca_a_estrela()
+
+        buscador = BuscasClassicas(self.labirinto)
+        resultado = buscador.busca_a_estrela()
+
         self.labirinto.inicio = inicio_original
         self.labirinto.objetivo = objetivo_original
 
@@ -30,6 +37,7 @@ class HillClimbing:
         caminho = resultado.caminho
 
         self.distancias[par] = (custo, caminho)
+
         return custo, caminho
 
     def gerar_solucao_inicial(self) -> List["Estado"]:
@@ -61,11 +69,13 @@ class HillClimbing:
         """Gera toda a vizinhança possível através de troca de 2 pontos (Swap)"""
         vizinhos = []
         n = len(solucao)
+
         for i in range(n):
             for j in range(i + 1, n):
                 vizinho = solucao.copy()
                 vizinho[i], vizinho[j] = vizinho[j], vizinho[i]
                 vizinhos.append(vizinho)
+
         return vizinhos
 
     def executar(self):
@@ -80,6 +90,9 @@ class HillClimbing:
         while True:
             iteracoes += 1
             vizinhos = self.gerar_todos_vizinhos(atual)
+
+            if not vizinhos:
+                break
             
             melhor_vizinho = None
             melhor_custo_vizinho = float('inf')
@@ -88,6 +101,7 @@ class HillClimbing:
             # Avalia TODOS os vizinhos e encontra o melhor (Steepest-Ascent)
             for vizinho in vizinhos:
                 c, cam = self.custo(vizinho)
+
                 if c < melhor_custo_vizinho:
                     melhor_custo_vizinho = c
                     melhor_vizinho = vizinho
@@ -99,6 +113,7 @@ class HillClimbing:
                 custo_atual = melhor_custo_vizinho
                 caminho_atual = melhor_caminho_vizinho
                 historico.append(custo_atual)
+
             else:
                 # Nenhum vizinho melhora a solução. Ótimo local atingido!
                 break
@@ -108,7 +123,7 @@ class HillClimbing:
         return {
             "melhor_solucao": atual,
             "caminho": caminho_atual,
-            "custo_final": custo_atual, # O custo real em que o algoritmo parou
+            "custo_final": custo_atual,  # O custo real em que o algoritmo parou
             "custo_inicial": custo_inicial,
             "historico": historico,
             "iteracoes": iteracoes,

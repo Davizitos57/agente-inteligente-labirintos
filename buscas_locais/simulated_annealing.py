@@ -1,14 +1,13 @@
 import math
 import random
 import time
-from typing import List, Optional
-from dataclasses import dataclass, field
-from resultados import ResultadoBusca
-from typing import TYPE_CHECKING
+from typing import List, TYPE_CHECKING
+
+from buscas_classicas.buscas import BuscasClassicas
 
 if TYPE_CHECKING:
-    from buscas import LabirintoBusca
-    from buscas import Estado
+    from labirinto import LabirintoBusca
+    from labirinto import Estado
     
     
 class SimulatedAnnealing:
@@ -28,6 +27,10 @@ class SimulatedAnnealing:
         self.distancias = {}
 
     def distancia(self, origem: "Estado", destino: "Estado"):
+        par = (origem, destino)
+
+        if par in self.distancias:
+            return self.distancias[par]
 
         inicio_original = self.labirinto.inicio
         objetivo_original = self.labirinto.objetivo
@@ -35,7 +38,8 @@ class SimulatedAnnealing:
         self.labirinto.inicio = origem
         self.labirinto.objetivo = destino
 
-        resultado = self.labirinto.busca_a_estrela()
+        buscador = BuscasClassicas(self.labirinto)
+        resultado = buscador.busca_a_estrela()
 
         self.labirinto.inicio = inicio_original
         self.labirinto.objetivo = objetivo_original
@@ -43,6 +47,7 @@ class SimulatedAnnealing:
         custo = resultado.custo_total
         caminho = resultado.caminho
 
+        self.distancias[par] = (custo, caminho)
 
         return custo, caminho
 
@@ -98,6 +103,9 @@ class SimulatedAnnealing:
 
         vizinho = solucao.copy()
 
+        if len(vizinho) < 2:
+            return vizinho
+
         i, j = random.sample(
             range(len(vizinho)),
             2
@@ -124,6 +132,7 @@ class SimulatedAnnealing:
         
         melhor_solucao = atual.copy()
         melhor_custo = custo_atual
+        melhor_caminho = caminho_atual
 
         historico = [custo_atual]
 
@@ -164,12 +173,14 @@ class SimulatedAnnealing:
                     atual = vizinho
                     custo_atual = custo_vizinho
                     caminho_atual = caminho_vizinhos
+
             ########################################################
 
             if custo_atual < melhor_custo:
 
                 melhor_solucao = atual.copy()
                 melhor_custo = custo_atual
+                melhor_caminho = caminho_atual
 
             historico.append(custo_atual)
 
@@ -181,9 +192,9 @@ class SimulatedAnnealing:
 
         return {
             "melhor_solucao": melhor_solucao,
-            "caminho": caminho_atual,
+            "caminho": melhor_caminho,
             "melhor_custo": melhor_custo,
-            "media_custo": sum(historico)/ len(historico),
+            "media_custo": sum(historico) / len(historico),
             "pior_custo": max(historico),
             "historico": historico,
             "iteracoes": iteracoes,
