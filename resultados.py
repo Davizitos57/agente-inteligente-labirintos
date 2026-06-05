@@ -87,3 +87,30 @@ class ResultadoSimulatedAnnealing(ResultadoBusca):
     #     plt.grid(True)
 
     #     plt.show()
+
+@dataclass
+class ResultadoHillClimbing(ResultadoBusca):
+    melhor_custo: float = 0.0
+    pior_custo: float = 0.0
+    custo_medio: float = 0.0
+    tempo_medio: float = 0.0
+    iteracoes_medias: float = 0.0
+    quantidade_execucoes: int = 0
+    melhor_solucao: Optional[List["Estado"]] = field(default_factory=list)
+    taxa_sucesso: float = 0.0
+    taxa_melhora: float = 0.0
+
+    def imprimir_metricas(self):
+        print("\n------------------------------------------------------\n")
+        print(f'Resultados obtidos por Múltiplas Execuções:\n')
+        print(f'Algoritmo executado: {self.algoritmo}')
+        print(f'Solução encontrada na melhor execução: {"sim" if self.encontrado else "não"}')
+        print(f'Número de execuções: {self.quantidade_execucoes}')
+        print(f'Melhor custo encontrado: {self.melhor_custo}')
+        print(f'Pior custo encontrado: {self.pior_custo}')
+        print(f'Custo médio: {self.custo_medio:.4f}')
+        print(f'Tempo médio: {self.tempo_medio:.4f}')
+        print(f'Iterações médias (Passos): {self.iteracoes_medias:.2f}')
+        print(f'Taxa de sucesso (solução aceitável): {self.taxa_sucesso * 100:.2f}%')
+        print(f'Taxa de melhora sobre o início: {self.taxa_melhora * 100:.2f}%')
+        print(f'Melhor ordem de visitação encontrada: {self.melhor_solucao}')

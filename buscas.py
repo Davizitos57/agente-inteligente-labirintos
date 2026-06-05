@@ -1,6 +1,6 @@
 from collections import deque
 from dataclasses import dataclass
-from resultados import ResultadoBusca, ResultadoSimulatedAnnealing
+from resultados import ResultadoBusca, ResultadoSimulatedAnnealing, ResultadoHillClimbing
 from simulated_annealing import SimulatedAnnealing
 from typing import Optional, Tuple, List, Dict, Set
 from pathlib import Path
@@ -365,46 +365,46 @@ class LabirintoBusca:
                                             taxa_melhora=melhoras_registradas / quantidade_execucoes
                                            )
         return resultado
-    
-    def hill_climbing(self) -> ResultadoBusca:
-            inicio_temp = time.time()
-            atual = No(self.inicio)
-            
-            nos_explorados = 1
-            nos_expandidos = 0
-            ordem_explorados = [atual.estado]
-            
-            while True:
-                if atual.estado == self.objetivo:
-                    caminho, acoes = self.reconstruirCaminho(atual)
-                    tempo_execucao = time.time() - inicio_temp
-                    return ResultadoBusca('Subida de Encosta (Hill Climbing)', True, caminho, acoes, nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, 1, atual.g)
-                
-                nos_expandidos += 1
-                vizinhos = self.vizinhos(atual.estado)
-                
-                if not vizinhos:
-                    break
-                    
-                melhor_vizinho = None
-                # Inicializamos com a heurística atual. Qualquer vizinho precisará ser ESTRITAMENTE menor que isso.
-                melhor_h = self.heuristica(atual.estado)
-                
-                for acao, estado, custo in vizinhos:
-                    h = self.heuristica(estado)
-                    
-                    # Exige melhoria estrita (<) para seguir a regra "se não melhora, retorne"
-                    if h < melhor_h:
-                        melhor_h = h
-                        melhor_vizinho = No(estado=estado, pai=atual, acao=acao, g=atual.g + custo)
-                
-                # Se nenhum vizinho melhorou a heurística atual, o algoritmo para (ótimo local alcançado)
-                if melhor_vizinho is None:
-                    break 
-                    
-                atual = melhor_vizinho
-                nos_explorados += 1
-                ordem_explorados.append(atual.estado)
-                
-            tempo_execucao = time.time() - inicio_temp
-            return ResultadoBusca('Subida de Encosta (Hill Climbing)', False, [], [], nos_explorados, nos_expandidos, ordem_explorados, tempo_execucao, 1, atual.g)
+        
+    def executar_experimentos_hill_climbing(self, quantidade_execucoes: int = 10) -> ResultadoHillClimbing:
+        from hill_climbing import HillClimbing
+
+        custos_finais = []
+        tempos = []
+        iteracoes = []
+        solucoes = []
+        caminhos_explorados = []
+        melhoras_registradas = 0
+
+        for _ in range(quantidade_execucoes):
+            hc = HillClimbing(labirinto=self)
+            resultado = hc.executar()
+
+            # Salva apenas o resultado FINAL em que a encosta parou
+            custos_finais.append(resultado["custo_final"])
+            tempos.append(resultado["tempo_execucao"])
+            iteracoes.append(resultado["iteracoes"])
+            solucoes.append(resultado['melhor_solucao'])
+            caminhos_explorados.append(resultado['caminho'])
+
+            if resultado["houve_melhora"]:
+                melhoras_registradas += 1
+
+        melhor_custo = min(custos_finais)
+        indice_melhor = custos_finais.index(melhor_custo)
+        
+        return ResultadoHillClimbing(
+            algoritmo='Hill Climbing',
+            encontrado=True,
+            caminho=caminhos_explorados[indice_melhor],
+            melhor_custo=melhor_custo,
+            pior_custo=max(custos_finais),
+            custo_medio=sum(custos_finais) / len(custos_finais),
+            tempo_medio=sum(tempos) / len(tempos),
+            iteracoes_medias=sum(iteracoes) / len(iteracoes),
+            quantidade_execucoes=quantidade_execucoes,
+            taxa_sucesso=1.0, # Sempre acha um caminho válido
+            taxa_melhora=melhoras_registradas / quantidade_execucoes,
+            melhor_solucao=solucoes[indice_melhor],
+            custo_total=melhor_custo
+        )

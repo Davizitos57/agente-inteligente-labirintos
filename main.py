@@ -166,7 +166,7 @@ def main():
             case '6': 
                 resultado = labirinto.executar_experimentos_annealing()
             case '7':
-                resultado = labirinto.hill_climbing()
+                resultado = labirinto.executar_experimentos_hill_climbing()
             case _:
                 print('Opção inválida!')
                 continue
