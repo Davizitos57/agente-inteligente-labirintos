@@ -40,6 +40,7 @@ class HillClimbing:
 
         return custo, caminho
 
+    # Permutação que dita a ordem em que o agente fará as coletas
     def gerar_solucao_inicial(self) -> List["Estado"]:
         solucao = self.labirinto.coletas.copy()
         random.shuffle(solucao)
