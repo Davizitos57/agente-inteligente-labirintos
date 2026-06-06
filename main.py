@@ -3,6 +3,7 @@ from pathlib import Path
 from labirinto import LabirintoBusca
 from buscas_classicas.buscas import BuscasClassicas
 from visualizacao import imprimir_labirinto
+from agente_online import AgenteOnlineAEstrela
 
 MAPAS = {
     "1": {
@@ -59,6 +60,7 @@ def escolher_algoritmo(mapa_com_coletas: bool):
     print("3 - Busca Uniforme (UCS)")
     print("4 - Busca Gulosa (Greedy Best-First Search)")
     print("5 - A*")
+    print("8 - Agente inteligente")
 
     if mapa_com_coletas:
         print("6 - Simulated Annealing")
@@ -155,6 +157,10 @@ def executar_algoritmo(opcao, buscador, labirinto, mapa_com_coletas):
                 return None
 
             return executar_experimentos_hill_climbing(labirinto)
+
+        case "8":
+            agente = AgenteOnlineAEstrela(labirinto)
+            return agente.executar()
 
         case _:
             print("Opção inválida!")

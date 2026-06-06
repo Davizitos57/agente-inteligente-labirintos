@@ -116,3 +116,36 @@ class ResultadoHillClimbing(ResultadoBusca):
         print(f'Taxa de sucesso (solução aceitável): {self.taxa_sucesso * 100:.2f}%')
         print(f'Taxa de melhora sobre o início: {self.taxa_melhora * 100:.2f}%')
         print(f'Melhor ordem de visitação encontrada: {self.melhor_solucao}')
+@dataclass
+class ResultadoBuscaOnline:
+    algoritmo: str
+    encontrado: bool
+    caminho: List["Estado"] = field(default_factory=list)
+    acoes: List[str] = field(default_factory=list)
+    movimentos: int = 0
+    custo_real: float = 0.0
+    celulas_reveladas: int = 0
+    celulas_revisitadas: int = 0
+    replanejamentos: int = 0
+    custo_otimo_offline: float = 0.0
+    razao_online_offline: float = 0.0
+    tempo_execucao: float = 0.0
+
+    @property
+    def tamanho_caminho(self) -> Optional[int]:
+        return len(self.acoes) if self.encontrado else None
+
+    def imprimir_metricas(self):
+        print("\n------------------------------------------------------\n")
+        print(f"Resultados obtidos:\n")
+        print(f"Algoritmo executado: {self.algoritmo}")
+        print(f"Solução encontrada: {'sim' if self.encontrado else 'não'}")
+        print(f"Número total de movimentos: {self.movimentos}")
+        print(f"Custo real percorrido: {self.custo_real}")
+        print(f"Número de células reveladas: {self.celulas_reveladas}")
+        print(f"Número de células revisitadas: {self.celulas_revisitadas}")
+        print(f"Número de replanejamentos: {self.replanejamentos}")
+        print(f"Tamanho do caminho encontrado: {self.tamanho_caminho}")
+        print(f"Custo ótimo offline: {self.custo_otimo_offline}")
+        print(f"Razão online/offline: {self.razao_online_offline:.4f}")
+        print(f"Tempo de execução: {self.tempo_execucao:.4f}")
