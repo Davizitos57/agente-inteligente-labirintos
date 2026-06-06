@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+      integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+      integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="scripts/scripts.js"></script>
+  </head>
+
+  <body>
+    <div class="container py-4">
+      <h1 class="text-center mb-4">Agente Inteligente em Labirintos</h1>
+
+      <div class="row">
+        <!-- PAINEL DE CONFIGURAÇÕES -->
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-header">Configurações</div>
+
+            <div class="card-body">
+              <div>
+                <div class="mb-3">
+                  <label class="form-label"> Algoritmo </label>
+
+                  <select
+                    id="algoritmo"
+                    class="form-select"
+                    onchange="setConfiguracoes()"
+                  >
+                    <option disabled selected value="none">
+                      Selecione um algoritmo
+                    </option>
+                    <option value="BFS">BFS</option>
+                    <option value="DFS">DFS</option>
+                    <option value="UCS">Busca Uniforme</option>
+                    <option value="Greedy Best First">Greedy Best First</option>
+                    <option value="A*">A*</option>
+                    <option value="Hill Climbing">Hill Climbing</option>
+                    <option value="Simulated Annealing">
+                      Simulated Annealing
+                    </option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label"> Labirinto </label>
+
+                  <select
+                    onchange="getLabirinto()"
+                    id="labirinto"
+                    class="form-select"
+                  >
+                    <option disabled selected value="none">
+                      Selecione um labirinto
+                    </option>
+                    <option value="labirinto_pequeno_uniforme">
+                      Labirinto pequeno
+                    </option>
+                    <option value="labirinto_pequeno_custos_variados">
+                      Labirinto pequeno com custo
+                    </option>
+                    <option value="labirinto_pequeno_com_coletas">
+                      Labirinto pequeno com pontos de coleta
+                    </option>
+                    <option value="labirinto_medio_uniforme">
+                      Labirinto médio
+                    </option>
+                    <option value="labirinto_medio_custos_variados">
+                      Labirinto médio com custo
+                    </option>
+                    <option value="labirinto_medio_com_coletas">
+                      Labirinto médio com pontos de coleta
+                    </option>
+                    <option value="labirinto_grande_uniforme">
+                      Labirinto grande
+                    </option>
+                    <option value="labirinto_grande_custos_variados">
+                      Labirinto grande com custo
+                    </option>
+                    <option value="labirinto_grande_com_coletas">
+                      Labirinto grande com pontos de coleta
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <hr />
+              <div id="conf-sa-hc" style="display: none">
+                <h6>Parâmetros SA</h6>
+
+                <div class="mb-2">
+                  <label class="form-label"> Temperatura Inicial </label>
+
+                  <input
+                    id="temperaturaInicial"
+                    type="number"
+                    value="1000"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label"> Temperatura Final </label>
+
+                  <input
+                    id="temperaturaFinal"
+                    type="number"
+                    value="0.01"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label"> Resfriamento </label>
+
+                  <input
+                    id="fatorResfriamento"
+                    type="number"
+                    value="0.95"
+                    step="0.01"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label"> Número de Execuções </label>
+
+                  <input
+                    id="qtdExecucoes"
+                    type="number"
+                    value="10"
+                    step="1"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+
+              <button onclick="executar()" class="btn btn-primary w-100">
+                <span
+                  style="display: none"
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="spinner-label">Executar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          <div class="row justify-content-center">
+            <div class="col-md-12">
+              <!-- Terminal Window -->
+              <div class="card bg-dark text-white font-monospace shadow">
+                <!-- Terminal Header -->
+                <div
+                  class="card-header bg-secondary d-flex align-items-center py-2 px-3"
+                >
+                  <div class="d-flex gap-2 me-3">
+                    <span
+                      class="d-inline-block rounded-circle bg-danger"
+                      style="width: 12px; height: 12px"
+                    ></span>
+                    <span
+                      class="d-inline-block rounded-circle bg-warning"
+                      style="width: 12px; height: 12px"
+                    ></span>
+                    <span
+                      class="d-inline-block rounded-circle bg-success"
+                      style="width: 12px; height: 12px"
+                    ></span>
+                  </div>
+                  <small class="text-light mx-auto m-0 opacity-75"
+                    >Labirinto</small
+                  >
+                </div>
+
+                <!-- Terminal Body -->
+                <div
+                  class="card-body terminal-body"
+                  style="height: 620px; overflow-y: auto; overflow-x: auto"
+                >
+                  <p class="mb-1">
+                    <span class="text-success">user@localhost:~$</span>
+                    <span class="terminal-cursor"></span>
+                  </p>
+                  <pre id="labirintoView" class="labirinto"></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="metricas-buscas-classicas"
+        class="row mt-4"
+        style="margin-top: 1.5rem; display: none"
+      >
+        <div class="col">
+          <div class="card shadow-sm">
+            <div class="card-header">Métricas Obtidas</div>
+
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Sucesso</h6>
+                    <h3 id="sucesso">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Custo</h6>
+                    <h3 id="custo">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Tempo</h6>
+                    <h3 id="tempo">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Nós Explorados</h6>
+                    <h3 id="explorados">-</h3>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Nós Expandidos</h6>
+                    <h3 id="expandidos">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Tam. Caminho</h6>
+                    <h3 id="caminho">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Tam. Fronteira</h6>
+                    <h3 id="fronteira">-</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADOS DO SA -->
+
+      <div id="metricas-buscas-locais" class="row mt-4" style="display: none">
+        <div class="col">
+          <div class="card shadow-sm">
+            <div class="card-header">Métricas da Busca Local</div>
+
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-2">
+                  <div class="border rounded p-3">
+                    <h6>Melhor Custo</h6>
+                    <h3 id="melhorCusto">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <div class="border rounded p-3">
+                    <h6>Pior Custo</h6>
+                    <h3 id="piorCusto">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <div class="border rounded p-3">
+                    <h6>Custo Médio</h6>
+                    <h3 id="custoMedio">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <div class="border rounded p-3">
+                    <h6>Tempo Médio</h6>
+                    <h3 id="tempoMedio">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <div class="border rounded p-3">
+                    <h6>Iterações</h6>
+                    <h3 id="iteracoes">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <div class="border rounded p-3">
+                    <h6>Execuções</h6>
+                    <h3 id="execucoes">-</h3>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Taxa de Sucesso</h6>
+                    <h3 id="taxaSucesso">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Taxa de Melhora</h6>
+                    <h3 id="taxaMelhora">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Custo Final</h6>
+                    <h3 id="custoFinal">-</h3>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="border rounded p-3">
+                    <h6>Solução Encontrada</h6>
+                    <h3 id="encontrado">-</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+    </div>
+  </body>
+</html>
