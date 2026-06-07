@@ -1,6 +1,7 @@
 import heapq
 import itertools
 import math
+import os
 import time
 from typing import Dict, List, Set
 
@@ -47,7 +48,7 @@ class AgenteOnlineAEstrela:
         self.replanejamentos = 0
         self.celulas_revisitadas = 0
 
-    def executar(self) -> ResultadoBuscaOnline:
+    def executar(self, mostrar_passo_a_passo: bool = True, delay: float = 0.15) -> ResultadoBuscaOnline:
         inicio_tempo = time.time()
 
         custo_otimo_offline = self.calcular_custo_otimo_offline()
@@ -61,15 +62,14 @@ class AgenteOnlineAEstrela:
 
             if iteracoes > limite_iteracoes:
                 tempo_execucao = time.time() - inicio_tempo
-
-                return self.gerar_resultado(
-                    encontrado=False,
-                    custo_otimo_offline=custo_otimo_offline,
-                    tempo_execucao=tempo_execucao
-                )
+                return self.gerar_resultado(False, custo_otimo_offline, tempo_execucao)
 
             # O agente revela a posição atual e as células vizinhas
             self.perceber()
+
+            # EXIBIÇÃO EM TEMPO REAL AQUI
+            if mostrar_passo_a_passo:
+                self.imprimir_estado_atual(delay)
 
             caminho_planejado, acoes_planejadas = self.planejar_com_a_estrela()
 
@@ -77,31 +77,26 @@ class AgenteOnlineAEstrela:
 
             if not caminho_planejado or len(caminho_planejado) < 2:
                 tempo_execucao = time.time() - inicio_tempo
+                return self.gerar_resultado(False, custo_otimo_offline, tempo_execucao)
 
-                return self.gerar_resultado(
-                    encontrado=False,
-                    custo_otimo_offline=custo_otimo_offline,
-                    tempo_execucao=tempo_execucao
-                )
-
-            proximo_estado = caminho_planejado[1] # O agente executa apenas o próximo passo do caminho planejado
+            proximo_estado = caminho_planejado[1]
             proxima_acao = acoes_planejadas[0]
 
             movimento_realizado = self.agir(proximo_estado, proxima_acao)
 
-            if not movimento_realizado:  # Se o movimento falhar, o agente apenas replaneja na próxima repetição
+            if not movimento_realizado:
                 continue
 
         # Ao chegar no objetivo, percebe a célula final
         self.perceber()
+        
+        # ---> EXIBIÇÃO DO FRAME FINAL (OBJETIVO ALCANÇADO)
+        if mostrar_passo_a_passo:
+            self.imprimir_estado_atual(delay)
 
         tempo_execucao = time.time() - inicio_tempo
 
-        return self.gerar_resultado(
-            encontrado=True,
-            custo_otimo_offline=custo_otimo_offline,
-            tempo_execucao=tempo_execucao
-        )
+        return self.gerar_resultado(True, custo_otimo_offline, tempo_execucao)
 
     def perceber(self):
         # Lista de células que serão reveladas pelo agente
@@ -338,3 +333,27 @@ class AgenteOnlineAEstrela:
             0 <= linha < self.altura
             and 0 <= coluna < self.largura
         )
+
+    def imprimir_estado_atual(self, delay: float = 0.15):
+        # Limpa o terminal a cada frame da animação
+        os.system('clear' if os.name == 'posix' else 'cls')
+        
+        print("\n================ EXPLORAÇÃO: AGENTE ONLINE ================\n")
+        
+        for i in range(self.altura):
+            linha_str = ""
+            for j in range(self.largura):
+                estado = (i, j)
+                if estado == self.posicao_atual:
+                    # Caractere especial para destacar a posição atual do agente
+                    linha_str += "@" 
+                else:
+                    # Imprime o que o agente já descobriu (ou "?" para o desconhecido)
+                    linha_str += self.mapa_interno[i][j]
+            print(linha_str)
+            
+        # Opcional: imprimir as métricas sendo atualizadas em tempo real
+        print(f"\nMovimentos: {self.movimentos} | Custo Real: {self.custo_real} | Replanejamentos: {self.replanejamentos}")
+        print("=============================================================\n")
+        
+        time.sleep(delay)
