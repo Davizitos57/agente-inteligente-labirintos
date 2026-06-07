@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, List, Optional, Any
 from dataclasses import dataclass, field
+import matplotlib.pyplot as plt
 
 if TYPE_CHECKING:
     from labirinto import Estado
@@ -38,7 +39,7 @@ class ResultadoBusca:
 @dataclass
 class ResultadoSimulatedAnnealing(ResultadoBusca):
 
-    # historico: List[float] = field(default_factory=list)
+    historico: List[float] = field(default_factory=list)
     melhor_custo: float = 0.0
     pior_custo: float = 0.0
     custo_medio: float = 0.0
@@ -70,24 +71,22 @@ class ResultadoSimulatedAnnealing(ResultadoBusca):
         print(f'Melhor solução encontrada: {self.melhor_solucao}')
         print(f'Taxa de melhora: {self.taxa_melhora * 100:.2f}%')
 
-    ##### AINDA A SER IMPLEMENTADO #####
-    #### PS: problemas de configurações da minha máquina
-    # def plotar_convergencia(self):
+    
+    def plotar_convergencia(self):
+        
+        plt.figure(figsize=(10,5))
+        plt.plot(self.historico)
+        plt.xlabel("Iteração")
+        plt.ylabel("Custo")
 
-    #     plt.figure(figsize=(10,5))
+        plt.title(
+            "Simulated Annealing - Curva de Convergência"
+        )
 
-    #     plt.plot(self.historico)
+        plt.grid(True)
 
-    #     plt.xlabel("Iteração")
-    #     plt.ylabel("Melhor custo")
-
-    #     plt.title(
-    #         "Simulated Annealing - Curva de Convergência"
-    #     )
-
-    #     plt.grid(True)
-
-    #     plt.show()
+        plt.show()
+        plt.savefig("grafico-sa.png")
 
 
 @dataclass

@@ -41,9 +41,9 @@ def executar_experimentos_annealing(labirinto, quantidade_execucoes: int = 10):
     melhor_solucao = solucoes[indice_melhor]
     melhor_caminho_explorado = caminhos_explorados[indice_melhor]
 
-    # historico = historicos[indice_melhor]
+    historico = historicos[indice_melhor]
 
-    return ResultadoSimulatedAnnealing(
+    resultado = ResultadoSimulatedAnnealing(
         algoritmo="Simulated Annealing",
         encontrado=True,
         caminho=melhor_caminho_explorado,
@@ -59,8 +59,11 @@ def executar_experimentos_annealing(labirinto, quantidade_execucoes: int = 10):
         fator_resfriamento=sa.fator_resfriamento,
         taxa_sucesso=taxa_sucesso / quantidade_execucoes,
         taxa_melhora=melhoras_registradas / quantidade_execucoes,
-        custo_total=melhor_custo
+        custo_total=melhor_custo,
+        historico=historico
     )
+    resultado.plotar_convergencia()
+    return resultado
 
 
 def executar_experimentos_hill_climbing(labirinto, quantidade_execucoes: int = 10):
