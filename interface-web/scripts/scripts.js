@@ -86,8 +86,13 @@ export async function executar() {
         document.getElementById("fatorResfriamento").value,
       );
 
-      resultado =
-        labirintoObj.executarExperimentosAnnealing(quantidadeExecucoes);
+      resultado = labirintoObj.executarExperimentosAnnealing(
+        temperaturaInicial,
+        temperaturaFinal,
+        fatorResfriamento,
+        quantidadeExecucoes,
+      );
+      resultado.plotarConvergencia()
       break;
 
     default:
@@ -124,7 +129,6 @@ function atualizarResultados(resultado) {
     metricasBuscasLocais.style.display = "none";
   }
 }
-
 
 function atualizarResultadosBuscaLocal(resultado) {
   document.getElementById("melhorCusto").textContent =

@@ -30,6 +30,7 @@ export class ResultadoBusca {
 
 export class ResultadoSimulatedAnnealing extends ResultadoBusca {
   constructor({
+    historico = [],
     melhorCusto = 0.0,
     piorCusto = 0.0,
     custoMedio = 0.0,
@@ -45,7 +46,7 @@ export class ResultadoSimulatedAnnealing extends ResultadoBusca {
     ...resultadoBusca
   } = {}) {
     super(resultadoBusca);
-
+    this.historico = historico
     this.melhorCusto = melhorCusto;
     this.piorCusto = piorCusto;
     this.custoMedio = custoMedio;
@@ -59,6 +60,86 @@ export class ResultadoSimulatedAnnealing extends ResultadoBusca {
     this.melhorSolucao = melhorSolucao;
     this.taxaMelhora = taxaMelhora;
   }
+
+  plotarConvergencia() {
+    console.log(this.historico)
+    const canvas =
+        document.getElementById(
+            "graficoConvergencia"
+        );
+
+    const labels =
+        this.historico.map(
+            (_, indice) => indice
+        );
+
+    if (window.graficoSA) {
+        window.graficoSA.destroy();
+    }
+
+    window.graficoSA =
+        new Chart(canvas, {
+
+            type: "line",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+                        label: "Custo",
+
+                        data: this.historico,
+
+                        borderColor:
+                            "rgb(54, 162, 235)",
+
+                        backgroundColor:
+                            "rgba(54, 162, 235, 0.2)",
+
+                        tension: 0.2,
+
+                        fill: false
+                    }
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    title: {
+                        display: true,
+                        text:
+                            "Simulated Annealing - Curva de Convergência"
+                    }
+                },
+
+                scales: {
+
+                    x: {
+
+                        title: {
+                            display: true,
+                            text: "Iteração"
+                        }
+                    },
+
+                    y: {
+
+                        title: {
+                            display: true,
+                            text: "Custo"
+                        }
+                    }
+                }
+            }
+        });
+}
 }
 
 export class ResultadoHillClimbing extends ResultadoBusca {

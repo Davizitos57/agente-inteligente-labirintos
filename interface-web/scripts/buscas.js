@@ -410,19 +410,12 @@ export class LabirintoBusca {
       const resultado = sa.executar();
 
       melhoresCustos.push(resultado.melhorCusto);
-
       pioresCustos.push(resultado.piorCusto);
-
       mediasCustos.push(resultado.mediaCusto);
-
       tempos.push(resultado.tempoExecucao);
-
       iteracoes.push(resultado.iteracoes);
-
       solucoes.push(resultado.melhorSolucao);
-
       caminhosExplorados.push(resultado.caminho);
-
       historicos.push(resultado.historico);
 
       if (resultado.isTaxaAceitavel) {
@@ -434,44 +427,28 @@ export class LabirintoBusca {
       }
     }
 
-    console.log("Melhores custos:", melhoresCustos);
-
     const melhorCusto = Math.min(...melhoresCustos);
-
     const indiceMelhor = melhoresCustos.indexOf(melhorCusto);
-
+    const historico = historicos[indiceMelhor]
+    
     return new ResultadoSimulatedAnnealing({
       algoritmo: "SIMULATED ANNEALING",
-
       encontrado: true,
-
       melhorCusto,
-
       melhorSolucao: solucoes[indiceMelhor],
-
       piorCusto: Math.max(...pioresCustos),
-
       custoMedio: mediasCustos.reduce((a, b) => a + b, 0) / mediasCustos.length,
-
       tempoMedio: tempos.reduce((a, b) => a + b, 0) / tempos.length,
-
       iteracoesMedias: iteracoes.reduce((a, b) => a + b, 0) / iteracoes.length,
-
       quantidadeExecucoes,
-
       temperaturaInicial: sa.temperaturaInicial,
-
       temperaturaFinal: sa.temperaturaFinal,
-
       fatorResfriamento: sa.fatorResfriamento,
-
       caminho: caminhosExplorados[indiceMelhor],
-
       taxaSucesso: taxaSucesso / quantidadeExecucoes,
-
       taxaMelhora: melhoriasRegistradas / quantidadeExecucoes,
-
       custoTotal: melhorCusto,
+      historico: historico
     });
   }
 
