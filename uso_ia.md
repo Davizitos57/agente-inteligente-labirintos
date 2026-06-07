@@ -123,3 +123,7 @@ A princípio, os resultados da IA foram válidos de acordo com a demanda e funci
 Após uma série de correções e alinhamentos entre o que estava sendo desenvolvido e o que era esperado de acordo com os requisitos do trabalho, foi atingida uma versão estável e coerente do algoritmo de Hill-Climbing.
 
 Versão essa que consiste em uma variação denominada "Steepest-Ascent" (ou Descida Mais Íngreme): avalia todos os vizinhos possíveis, depois de mapear tudo em volta, avança exatamente na direção que desce mais rápido.
+
+### Interface WEB
+
+A interface WEB foi gerada com auxílio do uso da IA para transcrever o código Python para a linguagem Javascript. Os prompts utilizados seguiram um padrão: `Com base no código Python fornecido, reescreva-o para a linguagem Javascript da forma mais fidedigna`. No final, ao reunir os códigos gerados pela IA, foi possível afirmar que ela produziu um código funcional idêntico à estrutura dos arquivos Python fornecidos, no qual foram necessárias adaptações em aspectos relacionados à importação dos arquivos e a estrutura HTML não agradável.
