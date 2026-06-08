@@ -18,8 +18,14 @@
 </head>
 
 <body>
-  <div class="container py-4">
-    <h1 class="text-center mb-4">Agente Inteligente em Labirintos</h1>
+  <div class="container">
+    <h1 class="text-center mb-4 fw-bold">
+      Agente Inteligente para Resolução de Labirintos
+    </h1>
+
+    <p class="text-center text-light mb-4">
+      Comparação de algoritmos clássicos, locais e online em ambientes parcialmente observáveis
+    </p>
 
     <div class="row">
       <!-- PAINEL DE CONFIGURAÇÕES -->
@@ -119,7 +125,7 @@
             </div>
 
             <button onclick="executar()" class="btn btn-primary w-100">
-              <span style="display: none" class="spinner-border spinner-border-sm" role="status"
+              <span style="display: none;" class="spinner-border spinner-border-sm" role="status"
                 aria-hidden="true"></span>
               <span class="spinner-label">Executar</span>
             </button>
@@ -131,9 +137,9 @@
         <div class="row justify-content-center">
           <div class="col-md-12">
             <!-- Terminal Window -->
-            <div class="card bg-dark text-white font-monospace shadow">
+            <div class="card terminal-window shadow-lg">
               <!-- Terminal Header -->
-              <div class="card-header bg-secondary d-flex align-items-center py-2 px-3">
+              <div class="card-header terminal-header d-flex align-items-center py-2 px-3">
                 <div class="d-flex gap-2 me-3">
                   <span class="d-inline-block rounded-circle bg-danger" style="width: 12px; height: 12px"></span>
                   <span class="d-inline-block rounded-circle bg-warning" style="width: 12px; height: 12px"></span>
@@ -144,7 +150,7 @@
 
               <!-- Terminal Body -->
               <div id="terminal-body" class="card-body terminal-body"
-                style="height: 620px; overflow-y: auto; overflow-x: auto">
+                style="height: 800px; overflow-y: auto; overflow-x: auto">
                 <p class="mb-1">
                   <span class="text-success">user@localhost:~$</span>
                   <span class="terminal-cursor"></span>
@@ -167,28 +173,28 @@
           <div class="card-body">
             <div class="row">
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Sucesso</h6>
                   <h3 id="sucesso">-</h3>
                 </div>
               </div>
 
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Custo</h6>
                   <h3 id="custo">-</h3>
                 </div>
               </div>
 
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Tempo</h6>
                   <h3 id="tempo">-</h3>
                 </div>
               </div>
 
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Nós Explorados</h6>
                   <h3 id="explorados">-</h3>
                 </div>
@@ -197,21 +203,21 @@
 
             <div class="row mt-3">
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Nós Expandidos</h6>
                   <h3 id="expandidos">-</h3>
                 </div>
               </div>
 
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Tam. Caminho</h6>
                   <h3 id="caminho">-</h3>
                 </div>
               </div>
 
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Tam. Fronteira</h6>
                   <h3 id="fronteira">-</h3>
                 </div>
@@ -232,42 +238,42 @@
           <div class="card-body">
             <div class="row g-3">
               <div class="col-md-2">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Melhor Custo</h6>
                   <h3 id="melhorCusto">-</h3>
                 </div>
               </div>
 
               <div class="col-md-2">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Pior Custo</h6>
                   <h3 id="piorCusto">-</h3>
                 </div>
               </div>
 
               <div class="col-md-2">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Custo Médio</h6>
                   <h3 id="custoMedio">-</h3>
                 </div>
               </div>
 
               <div class="col-md-2">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Tempo Médio</h6>
                   <h3 id="tempoMedio">-</h3>
                 </div>
               </div>
 
               <div class="col-md-2">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Iterações</h6>
                   <h3 id="iteracoes">-</h3>
                 </div>
               </div>
 
               <div class="col-md-2">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Execuções</h6>
                   <h3 id="execucoes">-</h3>
                 </div>
@@ -276,21 +282,21 @@
 
             <div class="row g-3 mt-2">
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Taxa de Sucesso</h6>
                   <h3 id="taxaSucesso">-</h3>
                 </div>
               </div>
 
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Taxa de Melhora</h6>
                   <h3 id="taxaMelhora">-</h3>
                 </div>
               </div>
 
               <div class="col-md-3">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Custo Final</h6>
                   <h3 id="custoFinal">-</h3>
                 </div>
@@ -305,7 +311,7 @@
             </div>
             <div class="row g-3 mt-2">
               <div class="col-12">
-                <div class="border rounded p-3">
+                <div class="metric-card metric-info">
                   <h6>Melhor Ordem de Visitação</h6>
                   <h5 id="melhorOrdem" class="text-break m-0">-</h5>
                 </div>
@@ -329,28 +335,28 @@
         <div class="row g-3">
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Algoritmo</h6>
               <h5 id="algoritmoOnline">-</h5>
             </div>
           </div>
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Encontrado</h6>
               <h3 id="encontradoOnline">-</h3>
             </div>
           </div>
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Movimentos</h6>
               <h3 id="movimentos">-</h3>
             </div>
           </div>
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Custo Real</h6>
               <h3 id="custoReal">-</h3>
             </div>
@@ -362,28 +368,28 @@
         <div class="row g-3 mt-2">
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Células Reveladas</h6>
               <h3 id="celulasReveladas">-</h3>
             </div>
           </div>
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Células Revisitadas</h6>
               <h3 id="celulasRevisitadas">-</h3>
             </div>
           </div>
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Replanejamentos</h6>
               <h3 id="replanejamentos">-</h3>
             </div>
           </div>
 
           <div class="col-md-3">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Tempo de Execução</h6>
               <h3 id="tempoExecucao">-</h3>
             </div>
@@ -395,14 +401,14 @@
         <div class="row g-3 mt-2">
 
           <div class="col-md-6">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Custo Ótimo Offline</h6>
               <h3 id="custoOtimoOffline">-</h3>
             </div>
           </div>
 
           <div class="col-md-6">
-            <div class="border rounded p-3 h-100">
+            <div class="rounded p-3 h-100 metric-card metric-info">
               <h6>Razão Online / Offline</h6>
               <h3 id="razaoOnlineOffline">-</h3>
             </div>
