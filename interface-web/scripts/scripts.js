@@ -1,6 +1,4 @@
-import { ResultadoBuscaOnline } from "./resultados.js";
-import { ResultadoHillClimbing } from "./resultados.js";
-import { ResultadoSimulatedAnnealing } from "./resultados.js";
+import { plotarConvergencia } from "./resultados.js";
 import { LabirintoBusca } from "./buscas.js";
 import { AgenteOnlineAEstrela } from "./agenteOnline.js";
 
@@ -47,7 +45,7 @@ export async function executar() {
     MAPAS[labirinto].includes("coletas");
 
   const labirintoObj = new LabirintoBusca(labirintoPath, usarCustoVariado);
-  LABIRINTO_ATUAL = labirintoObj;
+  LABIRINTO_ATUAL = {labirintoObj: labirintoObj, caminho: MAPAS[labirinto]};
   let resultado;
 
   switch (algoritmo) {
@@ -68,7 +66,7 @@ export async function executar() {
       break;
     case "Hill Climbing":
       resultado = labirintoObj.executarExperimentosHillClimbing(quantidadeExecucoes);
-      resultado.plotarConvergencia();
+     
       break;
 
     case "Simulated Annealing":
@@ -88,7 +86,6 @@ export async function executar() {
         fatorResfriamento,
         quantidadeExecucoes,
       );
-      resultado.plotarConvergencia()
       break;
 
     case "Agente Online":
@@ -122,21 +119,29 @@ function atualizarResultados(resultado) {
     metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "block";
-    if (containerGrafico) containerGrafico.style.display = "flex"; 
+    plotarConvergencia(resultado.historico)
+    console.log(LABIRINTO_ATUAL.caminho)
+    console.log(LABIRINTO_ATUAL)
+    if (LABIRINTO_ATUAL.caminho.includes("coletas")) {
+      containerGrafico.style.display = "block"; 
+    } else {
+      containerGrafico.style.display = "none"; 
+    }
+    
   } 
   else if (resultado.algoritmo && resultado.algoritmo.includes("Online")) {
     exibirResultadoOnline(resultado);
     metricasBuscasOnline.style.display = "block";
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "none";
-    if (containerGrafico) containerGrafico.style.display = "none"; 
+    containerGrafico.style.display = "none"; 
   } 
   else {
     setResultadosBuscaClassica(resultado);
     metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "block";
     metricasBuscasLocais.style.display = "none";
-    if (containerGrafico) containerGrafico.style.display = "none"; 
+    containerGrafico.style.display = "none"; 
   }
 }
 
@@ -257,7 +262,7 @@ export function getLabirinto() {
 
 export function setResultadoLabirinto(resultado) {
   const labirintoView = document.getElementById("labirintoView");
-  labirintoView.innerHTML = imprimirLabirinto(LABIRINTO_ATUAL, resultado);
+  labirintoView.innerHTML = imprimirLabirinto(LABIRINTO_ATUAL.labirintoObj, resultado);
 }
 
 window.setConfiguracoes = setConfiguracoes;

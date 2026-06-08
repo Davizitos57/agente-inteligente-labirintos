@@ -2,8 +2,8 @@ import { ResultadoBuscaOnline } from "./resultados.js";
 import { No } from "./buscas.js";
 
 export class AgenteOnlineAEstrela {
-  static DESCONHECIDO = "?";
-  static PAREDE = "#";
+  static DESCONHECIDO = "?"; 
+  static PAREDE = "█";
 
   constructor(labirintoReal) {
     this.labirintoReal = labirintoReal;
@@ -231,7 +231,7 @@ export class AgenteOnlineAEstrela {
     for (let i = 0; i < this.altura; i++) {
       for (let j = 0; j < this.largura; j++) {
         if (this.key([i, j]) === this.key(this.posicaoAtual)) {
-          saida += "@";
+          saida += "●";
         } else {
           saida += this.mapaInterno[i][j];
         }
