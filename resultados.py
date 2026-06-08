@@ -91,6 +91,7 @@ class ResultadoSimulatedAnnealing(ResultadoBusca):
 
 @dataclass
 class ResultadoHillClimbing(ResultadoBusca):
+    historico: List[float] = field(default_factory=list) 
     melhor_custo: float = 0.0
     pior_custo: float = 0.0
     custo_medio: float = 0.0
@@ -115,6 +116,20 @@ class ResultadoHillClimbing(ResultadoBusca):
         print(f'Taxa de sucesso (solução aceitável): {self.taxa_sucesso * 100:.2f}%')
         print(f'Taxa de melhora sobre o início: {self.taxa_melhora * 100:.2f}%')
         print(f'Melhor ordem de visitação encontrada: {self.melhor_solucao}')
+
+    def plotar_convergencia(self):
+        plt.figure(figsize=(10,5))
+        plt.plot(self.historico)
+        plt.xlabel("Iteração")
+        plt.ylabel("Custo")
+
+        plt.title("Hill Climbing - Curva de Convergência")
+
+        plt.grid(True)
+        
+        plt.savefig("grafico-hc.png") 
+        plt.show()                    
+
 @dataclass
 class ResultadoBuscaOnline:
     algoritmo: str

@@ -72,6 +72,7 @@ def executar_experimentos_hill_climbing(labirinto, quantidade_execucoes: int = 1
     iteracoes = []
     solucoes = []
     caminhos_explorados = []
+    historicos = [] 
 
     melhoras_registradas = 0
 
@@ -86,14 +87,17 @@ def executar_experimentos_hill_climbing(labirinto, quantidade_execucoes: int = 1
         iteracoes.append(resultado["iteracoes"])
         solucoes.append(resultado["melhor_solucao"])
         caminhos_explorados.append(resultado["caminho"])
+        historicos.append(resultado["historico"]) 
 
         if resultado["houve_melhora"]:
             melhoras_registradas += 1
 
     melhor_custo = min(custos_finais)
     indice_melhor = custos_finais.index(melhor_custo)
+    
+    melhor_historico = historicos[indice_melhor]
 
-    return ResultadoHillClimbing(
+    resultado = ResultadoHillClimbing(
         algoritmo="Hill Climbing",
         encontrado=True,
         caminho=caminhos_explorados[indice_melhor],
@@ -106,5 +110,10 @@ def executar_experimentos_hill_climbing(labirinto, quantidade_execucoes: int = 1
         taxa_sucesso=1.0,  # Sempre acha um caminho válido
         taxa_melhora=melhoras_registradas / quantidade_execucoes,
         melhor_solucao=solucoes[indice_melhor],
-        custo_total=melhor_custo
+        custo_total=melhor_custo,
+        historico=melhor_historico 
     )
+    
+    resultado.plotar_convergencia() 
+    
+    return resultado
