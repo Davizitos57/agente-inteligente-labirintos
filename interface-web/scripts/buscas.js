@@ -175,25 +175,31 @@ export class LabirintoBusca {
     const inicioTempo = performance.now();
 
     const inicio = new No(this.inicio);
-
     const fronteira = [inicio];
 
     const explorados = new Set();
+    const emFronteira = new Set([JSON.stringify(this.inicio)]);
 
     const ordemExplorados = [];
 
     let nosExplorados = 0;
     let nosExpandidos = 0;
+    let maiorTamanhoFronteira = fronteira.length;
 
     while (fronteira.length > 0) {
+      maiorTamanhoFronteira = Math.max(maiorTamanhoFronteira, fronteira.length);
+
       const no = fronteira.shift();
+      emFronteira.delete(JSON.stringify(no.estado));
+
       nosExplorados++;
       ordemExplorados.push(no.estado);
 
       if (
         no.estado[0] === this.objetivo[0] &&
         no.estado[1] === this.objetivo[1]
-      ) {
+      ) 
+      {
         const resultado = this.reconstruirCaminho(no);
 
         return new ResultadoBusca({
@@ -204,8 +210,8 @@ export class LabirintoBusca {
           nosExplorados,
           nosExpandidos,
           estadosExplorados: ordemExplorados,
-          tempoExecucao: (performance.now() - inicioTempo) / 1000,
-          tamanhoFronteira: fronteira.length,
+          tempoExecucao: performance.now() - inicioTempo,
+          tamanhoFronteira: maiorTamanhoFronteira,
           custoTotal: no.g,
         });
       }
@@ -214,8 +220,11 @@ export class LabirintoBusca {
       nosExpandidos++;
 
       for (const [acao, estado, custo] of this.vizinhos(no.estado)) {
-        if (!explorados.has(JSON.stringify(estado))) {
+        const chaveEstado = JSON.stringify(estado);
+
+        if (!explorados.has(chaveEstado) && !emFronteira.has(chaveEstado)) {
           fronteira.push(new No(estado, no, acao, no.g + custo));
+          emFronteira.add(chaveEstado);
         }
       }
     }
@@ -230,21 +239,24 @@ export class LabirintoBusca {
     const inicioTempo = performance.now();
 
     const inicio = new No(this.inicio);
-
     const fronteira = [inicio];
 
     const explorados = new Set();
+    const emFronteira = new Set([JSON.stringify(this.inicio)]);
 
     const ordemExplorados = [];
 
     let nosExplorados = 0;
     let nosExpandidos = 0;
+    let maiorTamanhoFronteira = fronteira.length;
 
     while (fronteira.length > 0) {
+      maiorTamanhoFronteira = Math.max(maiorTamanhoFronteira, fronteira.length);
+
       const no = fronteira.pop();
+      emFronteira.delete(JSON.stringify(no.estado));
 
       nosExplorados++;
-
       ordemExplorados.push(no.estado);
 
       if (
@@ -261,19 +273,21 @@ export class LabirintoBusca {
           nosExplorados,
           nosExpandidos,
           estadosExplorados: ordemExplorados,
-          tempoExecucao: (performance.now() - inicioTempo) / 1000,
-          tamanhoFronteira: fronteira.length,
+          tempoExecucao: performance.now() - inicioTempo,
+          tamanhoFronteira: maiorTamanhoFronteira,
           custoTotal: no.g,
         });
       }
 
       explorados.add(JSON.stringify(no.estado));
-
       nosExpandidos++;
 
       for (const [acao, estado, custo] of this.vizinhos(no.estado)) {
-        if (!explorados.has(JSON.stringify(estado))) {
+        const chaveEstado = JSON.stringify(estado);
+
+        if (!explorados.has(chaveEstado) && !emFronteira.has(chaveEstado)) {
           fronteira.push(new No(estado, no, acao, no.g + custo));
+          emFronteira.add(chaveEstado);
         }
       }
     }
@@ -281,6 +295,14 @@ export class LabirintoBusca {
     return new ResultadoBusca({
       algoritmo: "DFS",
       encontrado: false,
+      caminho: [],
+      acoes: [],
+      nosExplorados,
+      nosExpandidos,
+      estadosExplorados: ordemExplorados,
+      tempoExecucao: performance.now() - inicioTempo,
+      tamanhoFronteira: maiorTamanhoFronteira,
+      custoTotal: 0,
     });
   }
 
@@ -301,10 +323,13 @@ export class LabirintoBusca {
 
     let nosExplorados = 0;
     let nosExpandidos = 0;
+    let maiorTamanhoFronteira = fronteira.size();
 
     const ordemExplorados = [];
 
     while (!fronteira.isEmpty()) {
+      maiorTamanhoFronteira = Math.max(maiorTamanhoFronteira, fronteira.size());
+
       const { element: no } = fronteira.dequeue();
 
       const chave = JSON.stringify(no.estado);
@@ -332,7 +357,7 @@ export class LabirintoBusca {
           nosExpandidos,
           estadosExplorados: ordemExplorados,
           tempoExecucao: (performance.now() - inicioTempo) / 1000,
-          tamanhoFronteira: fronteira.size(),
+          tamanhoFronteira: maiorTamanhoFronteira,
           custoTotal: no.g,
         });
       }

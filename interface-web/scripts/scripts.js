@@ -180,8 +180,16 @@ function setResultadosBuscaClassica(resultado) {
   const tempo = resultado.tempoExecucao.toFixed(2) + " ms";
   const nosExplorados = resultado.estadosExplorados.length;
   const nosExpandidos = resultado.nosExpandidos;
+  
   const tamanhoCaminho =
-    resultado.tamanhoCaminho !== null ? resultado.tamanhoCaminho : "N/A";
+    resultado.tamanhoCaminho !== null && resultado.tamanhoCaminho !== undefined
+      ? resultado.tamanhoCaminho
+      : "N/A";
+  
+    const tamanhoFronteira =
+    resultado.tamanhoFronteira !== null && resultado.tamanhoFronteira !== undefined
+      ? resultado.tamanhoFronteira
+      : "N/A";
 
   document.getElementById("sucesso").textContent = sucesso;
   document.getElementById("custo").textContent = custo;
@@ -189,6 +197,7 @@ function setResultadosBuscaClassica(resultado) {
   document.getElementById("explorados").textContent = nosExplorados;
   document.getElementById("expandidos").textContent = nosExpandidos;
   document.getElementById("caminho").textContent = tamanhoCaminho;
+  document.getElementById("fronteira").textContent = tamanhoFronteira;
 }
 
 async function carregarMapa(caminho) {
