@@ -67,8 +67,8 @@ export async function executar() {
       resultado = labirintoObj.buscaAEstrela();
       break;
     case "Hill Climbing":
-      resultado =
-        labirintoObj.executarExperimentosHillClimbing(quantidadeExecucoes);
+      resultado = labirintoObj.executarExperimentosHillClimbing(quantidadeExecucoes);
+      resultado.plotarConvergencia();
       break;
 
     case "Simulated Annealing":
@@ -112,8 +112,8 @@ function atualizarResultados(resultado) {
   const metricasBuscasClassicas = document.getElementById("metricas-buscas-classicas");
   const metricasBuscasLocais = document.getElementById("metricas-buscas-locais");
   const metricasBuscasOnline = document.getElementById("metricas-busca-online");
+  const containerGrafico = document.getElementById("graficoConvergencia-container");
 
-  // Checagem para Buscas Locais
   if (
     resultado.algoritmo === "Hill Climbing" ||
     resultado.algoritmo === "SIMULATED ANNEALING"
@@ -122,19 +122,21 @@ function atualizarResultados(resultado) {
     metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "block";
+    if (containerGrafico) containerGrafico.style.display = "flex"; 
   } 
   else if (resultado.algoritmo && resultado.algoritmo.includes("Online")) {
     exibirResultadoOnline(resultado);
     metricasBuscasOnline.style.display = "block";
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "none";
+    if (containerGrafico) containerGrafico.style.display = "none"; 
   } 
-  // Se não for Local nem Online, é Busca Clássica
   else {
     setResultadosBuscaClassica(resultado);
     metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "block";
     metricasBuscasLocais.style.display = "none";
+    if (containerGrafico) containerGrafico.style.display = "none"; 
   }
 }
 
@@ -167,13 +169,13 @@ function setResultadosBuscaClassica(resultado) {
   const tempo = resultado.tempoExecucao.toFixed(2) + " ms";
   const nosExplorados = resultado.estadosExplorados.length;
   const nosExpandidos = resultado.nosExpandidos;
-  
+
   const tamanhoCaminho =
     resultado.tamanhoCaminho !== null && resultado.tamanhoCaminho !== undefined
       ? resultado.tamanhoCaminho
       : "N/A";
-  
-    const tamanhoFronteira =
+
+  const tamanhoFronteira =
     resultado.tamanhoFronteira !== null && resultado.tamanhoFronteira !== undefined
       ? resultado.tamanhoFronteira
       : "N/A";

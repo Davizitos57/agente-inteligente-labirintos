@@ -63,14 +63,14 @@ export class ResultadoSimulatedAnnealing extends ResultadoBusca {
 
   plotarConvergencia() {
     const canvas = document.getElementById("graficoConvergencia");
-
     const labels = this.historico.map((_, indice) => indice);
 
-    if (window.graficoSA) {
-      window.graficoSA.destroy();
+    // Usa uma variável genérica para evitar conflitos 
+    if (window.graficoBuscaLocal) {
+      window.graficoBuscaLocal.destroy();
     }
 
-    window.graficoSA = new Chart(canvas, {
+    window.graficoBuscaLocal = new Chart(canvas, {
       type: "line",
 
       data: {
@@ -148,6 +148,50 @@ export class ResultadoHillClimbing extends ResultadoBusca {
     this.melhorSolucao = melhorSolucao;
     this.taxaSucesso = taxaSucesso;
     this.taxaMelhora = taxaMelhora;
+  }
+
+  plotarConvergencia() {
+    const canvas = document.getElementById("graficoConvergencia");
+    const labels = this.historico.map((_, indice) => indice);
+
+    // Destrói o gráfico anterior (seja ele do SA ou de execuções anteriores do HC)
+    if (window.graficoBuscaLocal) {
+      window.graficoBuscaLocal.destroy();
+    }
+
+    window.graficoBuscaLocal = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Custo",
+            data: this.historico,
+            borderColor: "rgb(255, 99, 132)", // Cor vermelha para o Hill Climbing
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            tension: 0.2,
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Hill Climbing - Curva de Convergência",
+          },
+        },
+        scales: {
+          x: {
+            title: { display: true, text: "Iteração" },
+          },
+          y: {
+            title: { display: true, text: "Custo" },
+          },
+        },
+      },
+    });
   }
 }
 
