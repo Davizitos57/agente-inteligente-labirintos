@@ -303,13 +303,5 @@ function exibirResultadoOnline(resultado) {
     resultado.razaoOnlineOffline.toFixed(2);
 
   document.getElementById("tempoExecucao").textContent =
-    resultado.tempoExecucao.toFixed(4) + "s";
-
-  document.getElementById("caminho").textContent = JSON.stringify(
-    resultado.caminho,
-    null,
-    2,
-  );
-
-  document.getElementById("acoes").textContent = resultado.acoes.join(" → ");
+    resultado.tempoExecucao.toFixed(4) + "s"; 
 }
