@@ -1,133 +1,69 @@
 import time
-import random
-from typing import List, TYPE_CHECKING
-
-from buscas_classicas.buscas import BuscasClassicas
+from typing import TYPE_CHECKING
+from buscas_locais.busca_local import BuscaLocal
 
 if TYPE_CHECKING:
     from labirinto import LabirintoBusca
-    from labirinto import Estado
 
-
-class HillClimbing:
+class HillClimbing(BuscaLocal):
     
     def __init__(self, labirinto: "LabirintoBusca"):
-        self.labirinto = labirinto
-        self.distancias = {}
+        # Repassa o labirinto para a classe pai
+        super().__init__(labirinto)
 
-    def distancia(self, origem: "Estado", destino: "Estado"):
-        par = (origem, destino)
-
-        if par in self.distancias:
-            return self.distancias[par]
-
-        inicio_original = self.labirinto.inicio
-        objetivo_original = self.labirinto.objetivo
-
-        self.labirinto.inicio = origem
-        self.labirinto.objetivo = destino
-
-        buscador = BuscasClassicas(self.labirinto)
-        resultado = buscador.busca_a_estrela()
-
-        self.labirinto.inicio = inicio_original
-        self.labirinto.objetivo = objetivo_original
-
-        custo = resultado.custo_total
-        caminho = resultado.caminho
-
-        self.distancias[par] = (custo, caminho)
-
-        return custo, caminho
-
-    # Permutação que dita a ordem em que o agente fará as coletas
-    def gerar_solucao_inicial(self) -> List["Estado"]:
-        solucao = self.labirinto.coletas.copy()
-        random.shuffle(solucao)
-        return solucao
-
-    def custo(self, solucao: List["Estado"]):
-        if len(solucao) == 0:
-            return self.distancia(self.labirinto.inicio, self.labirinto.objetivo)
-
-        custo_total = 0
-        caminho_final = []
-        atual = self.labirinto.inicio
-
-        for coleta in solucao:
-            custo, caminho = self.distancia(atual, coleta)
-            custo_total += custo
-            caminho_final.extend(caminho)
-            atual = coleta
-
-        custo, caminho = self.distancia(atual, self.labirinto.objetivo)
-        custo_total += custo
-        caminho_final.extend(caminho)
-
-        return custo_total, caminho_final
-
-    def gerar_todos_vizinhos(self, solucao: List["Estado"]) -> List[List["Estado"]]:
-        """Gera toda a vizinhança possível através de troca de 2 pontos (Swap)"""
-        vizinhos = []
-        n = len(solucao)
-
-        for i in range(n):
-            for j in range(i + 1, n):
-                vizinho = solucao.copy()
-                vizinho[i], vizinho[j] = vizinho[j], vizinho[i]
-                vizinhos.append(vizinho)
-
-        return vizinhos
-
-    def executar(self):
+    def executar(self, max_tentativas_sem_melhora: int = 100):
         atual = self.gerar_solucao_inicial()
         custo_atual, caminho_atual = self.custo(atual)
         custo_inicial = custo_atual
         
+        melhor_solucao = atual.copy()
+        melhor_custo = custo_atual
+        melhor_caminho = caminho_atual
+
         historico = [custo_atual]
         iteracoes = 0
+        tentativas_sem_melhora = 0
+
         inicio_tempo = time.time()
 
-        while True:
+        # Continua tentando até esgotar o limite de tentativas frustradas
+        while tentativas_sem_melhora < max_tentativas_sem_melhora:
             iteracoes += 1
-            vizinhos = self.gerar_todos_vizinhos(atual)
-
-            if not vizinhos:
-                break
             
-            melhor_vizinho = None
-            melhor_custo_vizinho = float('inf')
-            melhor_caminho_vizinho = None
+            # 1. Gera um vizinho aleatório (herdado da classe base)
+            vizinho = self.gerar_vizinho(atual)
+            custo_vizinho, caminho_vizinhos = self.custo(vizinho)
 
-            # Avalia TODOS os vizinhos e encontra o melhor (Steepest-Ascent)
-            for vizinho in vizinhos:
-                c, cam = self.custo(vizinho)
-
-                if c < melhor_custo_vizinho:
-                    melhor_custo_vizinho = c
-                    melhor_vizinho = vizinho
-                    melhor_caminho_vizinho = cam
-
-            # Condição de parada rigorosa: só move se for estritamente melhor
-            if melhor_custo_vizinho < custo_atual:
-                atual = melhor_vizinho
-                custo_atual = melhor_custo_vizinho
-                caminho_atual = melhor_caminho_vizinho
-                historico.append(custo_atual)
-
+            # 2. Avalia: No Hill Climbing (First-Choice), só aceita se for estritamente melhor
+            if custo_vizinho < custo_atual:
+                atual = vizinho
+                custo_atual = custo_vizinho
+                caminho_atual = caminho_vizinhos
+                
+                tentativas_sem_melhora = 0 # Encontrou um caminho melhor, reseta o limite
             else:
-                # Nenhum vizinho melhora a solução. Ótimo local atingido!
-                break
+                # Se for igual ou pior, não aceita e conta como tentativa frustrada
+                tentativas_sem_melhora += 1
+                
+            # Atualiza o melhor global encontrado até agora
+            if custo_atual < melhor_custo:
+                melhor_solucao = atual.copy()
+                melhor_custo = custo_atual
+                melhor_caminho = caminho_atual
+
+            historico.append(custo_atual)
 
         tempo_execucao = time.time() - inicio_tempo
 
         return {
-            "melhor_solucao": atual,
-            "caminho": caminho_atual,
-            "custo_final": custo_atual,  # O custo real em que o algoritmo parou
+            "melhor_solucao": melhor_solucao,
+            "caminho": melhor_caminho,
+            "custo_final": custo_atual, # Importante: retorna onde ele parou (para expor mínimos locais)
             "custo_inicial": custo_inicial,
+            "melhor_custo": melhor_custo,
             "historico": historico,
             "iteracoes": iteracoes,
             "tempo_execucao": tempo_execucao,
-            "houve_melhora": custo_atual < custo_inicial
+            "is_taxa_aceitavel": melhor_custo <= custo_inicial,
+            "houve_melhora": melhor_custo < custo_inicial
         }
