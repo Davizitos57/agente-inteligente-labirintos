@@ -164,6 +164,7 @@ export class HillClimbing {
       iteracoes,
       tempoExecucao,
       houveMelhora: custoAtual < custoInicial,
+      historico: historico
     };
   }
 }

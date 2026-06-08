@@ -459,6 +459,7 @@ export class LabirintoBusca {
 
     const solucoes = [];
     const caminhosExplorados = [];
+    const historicos = []
 
     let melhoriasRegistradas = 0;
 
@@ -468,14 +469,11 @@ export class LabirintoBusca {
       const resultado = hc.executar();
 
       custosFinais.push(resultado.custoFinal);
-
       tempos.push(resultado.tempoExecucao);
-
       iteracoes.push(resultado.iteracoes);
-
       solucoes.push(resultado.melhorSolucao);
-
       caminhosExplorados.push(resultado.caminho);
+      historicos.push(resultado.historico)
 
       if (resultado.houveMelhora) {
         melhoriasRegistradas++;
@@ -483,35 +481,24 @@ export class LabirintoBusca {
     }
 
     const melhorCusto = Math.min(...custosFinais);
-
     const indiceMelhor = custosFinais.indexOf(melhorCusto);
+    const historico = historicos[indiceMelhor]
 
     return new ResultadoHillClimbing({
       algoritmo: "Hill Climbing",
-
       encontrado: true,
-
       caminho: caminhosExplorados[indiceMelhor],
-
       melhorCusto,
-
       piorCusto: Math.max(...custosFinais),
-
       custoMedio: custosFinais.reduce((a, b) => a + b, 0) / custosFinais.length,
-
       tempoMedio: tempos.reduce((a, b) => a + b, 0) / tempos.length,
-
       iteracoesMedias: iteracoes.reduce((a, b) => a + b, 0) / iteracoes.length,
-
       quantidadeExecucoes,
-
       taxaSucesso: 1.0,
-
       taxaMelhora: melhoriasRegistradas / quantidadeExecucoes,
-
       melhorSolucao: solucoes[indiceMelhor],
-
       custoTotal: melhorCusto,
+      historico: historico
     });
   }
 }

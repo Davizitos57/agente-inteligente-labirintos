@@ -1,9 +1,7 @@
-import { ResultadoBusca, ResultadoBuscaOnline } from "./resultados.js";
+import { ResultadoBuscaOnline } from "./resultados.js";
 import { ResultadoHillClimbing } from "./resultados.js";
 import { ResultadoSimulatedAnnealing } from "./resultados.js";
 import { LabirintoBusca } from "./buscas.js";
-import { HillClimbing } from "./buscasLocais/hillClimbing.js";
-import { SimulatedAnnealing } from "./buscasLocais/simulatedAnnealing.js";
 import { AgenteOnlineAEstrela } from "./agenteOnline.js";
 
 const MAPAS = {
@@ -90,22 +88,18 @@ export async function executar() {
         fatorResfriamento,
         quantidadeExecucoes,
       );
-      resultado.plotarConvergencia();
+      resultado.plotarConvergencia()
       break;
 
     case "Agente Online":
       const agente = new AgenteOnlineAEstrela(labirintoObj);
-      resultado = agente.executar();
+      resultado = await agente.executar();
       break;
     default:
       console.error("Algoritmo desconhecido");
   }
-  console.log(resultado);
-  return
-  if (resultado instanceof ResultadoBuscaOnline) {
-  } else {
-    atualizarResultados(resultado);
-  }
+
+  atualizarResultados(resultado);
 
   btn.querySelector(".spinner-border").style.display = "none";
   btn.querySelector(".spinner-label").style.display = "Executar";
@@ -121,22 +115,30 @@ function atualizarResultados(resultado) {
   const metricasBuscasLocais = document.getElementById(
     "metricas-buscas-locais",
   );
-  
+
+  const metricasBuscasOnline = document.getElementById("metricas-busca-online");
+
   if (
     resultado instanceof ResultadoHillClimbing ||
     resultado instanceof ResultadoSimulatedAnnealing
   ) {
     atualizarResultadosBuscaLocal(resultado);
+    metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "block";
-  } else if (resultado instanceof ResultadoBuscaOnline) {
-    metricasBuscasClassicas.style.display = "block";
+  }
+  if (resultado instanceof ResultadoBuscaOnline) {
+    exibirResultadoOnline(resultado);
+    metricasBuscasOnline.style.display = "block";
+    metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "none";
   } else {
     setResultadosBuscaClassica(resultado);
+    metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "block";
     metricasBuscasLocais.style.display = "none";
   }
+
 }
 
 function atualizarResultadosBuscaLocal(resultado) {
@@ -271,4 +273,43 @@ export function setConfiguracoes() {
   } else {
     configs.style.display = "none";
   }
+}
+
+function exibirResultadoOnline(resultado) {
+  document.getElementById("algoritmoOnline").textContent = resultado.algoritmo;
+
+  document.getElementById("encontradoOnline").textContent = resultado.encontrado
+    ? "Sim"
+    : "Não";
+
+  document.getElementById("movimentos").textContent = resultado.movimentos;
+
+  document.getElementById("custoReal").textContent =
+    resultado.custoReal.toFixed(2);
+
+  document.getElementById("celulasReveladas").textContent =
+    resultado.celulasReveladas;
+
+  document.getElementById("celulasRevisitadas").textContent =
+    resultado.celulasRevisitadas;
+
+  document.getElementById("replanejamentos").textContent =
+    resultado.replanejamentos;
+
+  document.getElementById("custoOtimoOffline").textContent =
+    resultado.custoOtimoOffline.toFixed(2);
+
+  document.getElementById("razaoOnlineOffline").textContent =
+    resultado.razaoOnlineOffline.toFixed(2);
+
+  document.getElementById("tempoExecucao").textContent =
+    resultado.tempoExecucao.toFixed(4) + "s";
+
+  document.getElementById("caminho").textContent = JSON.stringify(
+    resultado.caminho,
+    null,
+    2,
+  );
+
+  document.getElementById("acoes").textContent = resultado.acoes.join(" → ");
 }

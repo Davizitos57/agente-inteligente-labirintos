@@ -45,7 +45,7 @@
                   <option value="Simulated Annealing">
                     Simulated Annealing
                   </option>
-                   <option value="Agente Online">
+                  <option value="Agente Online">
                     Agente Online
                   </option>
                 </select>
@@ -143,12 +143,14 @@
               </div>
 
               <!-- Terminal Body -->
-              <div class="card-body terminal-body" style="height: 620px; overflow-y: auto; overflow-x: auto">
+              <div id="terminal-body" class="card-body terminal-body" style="height: 620px; overflow-y: auto; overflow-x: auto">
                 <p class="mb-1">
                   <span class="text-success">user@localhost:~$</span>
                   <span class="terminal-cursor"></span>
                 </p>
-                <pre id="labirintoView" class="labirinto"></pre>
+                <div id="terminal-body-view">
+                   <pre id="labirintoView" class="labirinto"></pre>
+                </div>
               </div>
             </div>
           </div>
@@ -305,26 +307,113 @@
       </div>
     </div>
 
-    <div class="row mt-4">
+    <div id="metricas-busca-online" class="card mt-4" style="display: none;">
 
-      <div class="col">
+  <div class="card-header">
+    Métricas da Busca Online
+  </div>
 
-        <div class="card shadow-sm">
+  <div class="card-body">
 
-          <div class="card-header">
-            Curva de Convergência da execução de melhor custo
-          </div>
+    <!-- Primeira linha -->
+    <div class="row g-3">
 
-          <div class="card-body">
-
-            <canvas id="graficoConvergencia"></canvas>
-
-          </div>
-
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Algoritmo</h6>
+          <h5 id="algoritmoOnline">-</h5>
         </div>
-
       </div>
 
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Encontrado</h6>
+          <h3 id="encontradoOnline">-</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Movimentos</h6>
+          <h3 id="movimentos">-</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Custo Real</h6>
+          <h3 id="custoReal">-</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Segunda linha -->
+    <div class="row g-3 mt-2">
+
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Células Reveladas</h6>
+          <h3 id="celulasReveladas">-</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Células Revisitadas</h6>
+          <h3 id="celulasRevisitadas">-</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Replanejamentos</h6>
+          <h3 id="replanejamentos">-</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="border rounded p-3 h-100">
+          <h6>Tempo de Execução</h6>
+          <h3 id="tempoExecucao">-</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Terceira linha -->
+    <div class="row g-3 mt-2">
+
+      <div class="col-md-6">
+        <div class="border rounded p-3 h-100">
+          <h6>Custo Ótimo Offline</h6>
+          <h3 id="custoOtimoOffline">-</h3>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="border rounded p-3 h-100">
+          <h6>Razão Online / Offline</h6>
+          <h3 id="razaoOnlineOffline">-</h3>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+    <div class="row mt-4" id="graficoConvergencia-container">
+      <div class="col">
+        <div class="card shadow-sm">
+          <div class="card-header" >
+            Curva de Convergência da execução de melhor custo
+          </div>
+          <div class="card-body">
+            <canvas id="graficoConvergencia"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>

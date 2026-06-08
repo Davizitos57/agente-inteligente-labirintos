@@ -125,6 +125,7 @@ export class ResultadoSimulatedAnnealing extends ResultadoBusca {
 
 export class ResultadoHillClimbing extends ResultadoBusca {
   constructor({
+    historico = [],
     melhorCusto = 0.0,
     piorCusto = 0.0,
     custoMedio = 0.0,
@@ -137,7 +138,7 @@ export class ResultadoHillClimbing extends ResultadoBusca {
     ...resultadoBusca
   } = {}) {
     super(resultadoBusca);
-
+    this.historico = historico
     this.melhorCusto = melhorCusto;
     this.piorCusto = piorCusto;
     this.custoMedio = custoMedio;
@@ -150,7 +151,7 @@ export class ResultadoHillClimbing extends ResultadoBusca {
   }
 }
 
-export class ResultadoBuscaOnline {
+export class ResultadoBuscaOnline extends ResultadoBusca {
   constructor({
     algoritmo,
     encontrado,
@@ -164,7 +165,9 @@ export class ResultadoBuscaOnline {
     custoOtimoOffline = 0.0,
     razaoOnlineOffline = 0.0,
     tempoExecucao = 0.0,
+    ...resultado
   }) {
+    super(resultado);
     this.algoritmo = algoritmo;
     this.encontrado = encontrado;
 

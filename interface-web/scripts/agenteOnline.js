@@ -39,7 +39,7 @@ export class AgenteOnlineAEstrela {
     return `${estado[0]},${estado[1]}`;
   }
 
-  async executar(mostrarPassoAPasso = true, delay = 150) {
+  async executar(mostrarPassoAPasso = true, delay = 250) {
    
     const inicioTempo = performance.now();
 
@@ -71,7 +71,6 @@ export class AgenteOnlineAEstrela {
 
       if (!caminhoPlanejado || caminhoPlanejado.length < 2) {
         const tempoExecucao = (performance.now() - inicioTempo) / 1000;
-        console.log('aquiiii')
         return this.gerarResultado(false, custoOtimoOffline, tempoExecucao);
       }
 
@@ -84,7 +83,6 @@ export class AgenteOnlineAEstrela {
       if (!movimentoRealizado) {
         continue;
       }
-      console.log('iteracao: '+ iteracoes)
     }
     
 
@@ -95,7 +93,6 @@ export class AgenteOnlineAEstrela {
     }
 
     const tempoExecucao = (performance.now() - inicioTempo) / 1000;
-    console.log('termina')
     return this.gerarResultado(true, custoOtimoOffline, tempoExecucao);
   }
 
@@ -243,10 +240,10 @@ export class AgenteOnlineAEstrela {
       saida += "\n";
     }
 
-    const terminal = document.getElementById("terminal-body");
-
+    const terminal = document.getElementById("terminal-body-view");
+    
     if (terminal) {
-      terminal.innerHTML = `<pre>${saida}</pre>
+      terminal.innerHTML = `<pre id='labirintoView'>${saida}</pre>
                 <hr>
                 Movimentos: ${this.movimentos}
                 <br>
@@ -353,7 +350,6 @@ export class AgenteOnlineAEstrela {
     const acoes = [];
 
     let atual = no;
-    console.log('no ' + no)
 
     while (atual !== null && atual !== undefined) {
         estados.push(atual.estado);
