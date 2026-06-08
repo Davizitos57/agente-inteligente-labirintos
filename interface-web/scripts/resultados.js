@@ -46,7 +46,7 @@ export class ResultadoSimulatedAnnealing extends ResultadoBusca {
     ...resultadoBusca
   } = {}) {
     super(resultadoBusca);
-    this.historico = historico
+    this.historico = historico;
     this.melhorCusto = melhorCusto;
     this.piorCusto = piorCusto;
     this.custoMedio = custoMedio;
@@ -62,84 +62,65 @@ export class ResultadoSimulatedAnnealing extends ResultadoBusca {
   }
 
   plotarConvergencia() {
-    console.log(this.historico)
-    const canvas =
-        document.getElementById(
-            "graficoConvergencia"
-        );
+    const canvas = document.getElementById("graficoConvergencia");
 
-    const labels =
-        this.historico.map(
-            (_, indice) => indice
-        );
+    const labels = this.historico.map((_, indice) => indice);
 
     if (window.graficoSA) {
-        window.graficoSA.destroy();
+      window.graficoSA.destroy();
     }
 
-    window.graficoSA =
-        new Chart(canvas, {
+    window.graficoSA = new Chart(canvas, {
+      type: "line",
 
-            type: "line",
+      data: {
+        labels: labels,
 
-            data: {
+        datasets: [
+          {
+            label: "Custo",
 
-                labels: labels,
+            data: this.historico,
 
-                datasets: [
+            borderColor: "rgb(54, 162, 235)",
 
-                    {
-                        label: "Custo",
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
 
-                        data: this.historico,
+            tension: 0.2,
 
-                        borderColor:
-                            "rgb(54, 162, 235)",
+            fill: false,
+          },
+        ],
+      },
 
-                        backgroundColor:
-                            "rgba(54, 162, 235, 0.2)",
+      options: {
+        responsive: true,
 
-                        tension: 0.2,
+        plugins: {
+          title: {
+            display: true,
+            text: "Simulated Annealing - Curva de Convergência",
+          },
+        },
 
-                        fill: false
-                    }
-                ]
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Iteração",
             },
+          },
 
-            options: {
-
-                responsive: true,
-
-                plugins: {
-
-                    title: {
-                        display: true,
-                        text:
-                            "Simulated Annealing - Curva de Convergência"
-                    }
-                },
-
-                scales: {
-
-                    x: {
-
-                        title: {
-                            display: true,
-                            text: "Iteração"
-                        }
-                    },
-
-                    y: {
-
-                        title: {
-                            display: true,
-                            text: "Custo"
-                        }
-                    }
-                }
-            }
-        });
-}
+          y: {
+            title: {
+              display: true,
+              text: "Custo",
+            },
+          },
+        },
+      },
+    });
+  }
 }
 
 export class ResultadoHillClimbing extends ResultadoBusca {
@@ -166,5 +147,45 @@ export class ResultadoHillClimbing extends ResultadoBusca {
     this.melhorSolucao = melhorSolucao;
     this.taxaSucesso = taxaSucesso;
     this.taxaMelhora = taxaMelhora;
+  }
+}
+
+export class ResultadoBuscaOnline {
+  constructor({
+    algoritmo,
+    encontrado,
+    caminho = [],
+    acoes = [],
+    movimentos = 0,
+    custoReal = 0.0,
+    celulasReveladas = 0,
+    celulasRevisitadas = 0,
+    replanejamentos = 0,
+    custoOtimoOffline = 0.0,
+    razaoOnlineOffline = 0.0,
+    tempoExecucao = 0.0,
+  }) {
+    this.algoritmo = algoritmo;
+    this.encontrado = encontrado;
+
+    this.caminho = caminho;
+    this.acoes = acoes;
+
+    this.movimentos = movimentos;
+    this.custoReal = custoReal;
+
+    this.celulasReveladas = celulasReveladas;
+    this.celulasRevisitadas = celulasRevisitadas;
+
+    this.replanejamentos = replanejamentos;
+
+    this.custoOtimoOffline = custoOtimoOffline;
+    this.razaoOnlineOffline = razaoOnlineOffline;
+
+    this.tempoExecucao = tempoExecucao;
+  }
+
+  get tamanhoCaminho() {
+    return this.encontrado ? this.acoes.length : null;
   }
 }

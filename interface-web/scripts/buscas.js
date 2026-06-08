@@ -6,7 +6,7 @@ import {
 import { SimulatedAnnealing } from "./buscasLocais/simulatedAnnealing.js";
 import { HillClimbing } from "./buscasLocais/hillClimbing.js";
 
-class No {
+export class No {
   constructor(estado, pai = null, acao = null, g = 0) {
     this.estado = estado;
     this.pai = pai;
@@ -430,7 +430,7 @@ export class LabirintoBusca {
     const melhorCusto = Math.min(...melhoresCustos);
     const indiceMelhor = melhoresCustos.indexOf(melhorCusto);
     const historico = historicos[indiceMelhor]
-    
+
     return new ResultadoSimulatedAnnealing({
       algoritmo: "SIMULATED ANNEALING",
       encontrado: true,

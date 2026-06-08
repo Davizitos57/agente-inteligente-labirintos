@@ -69,7 +69,8 @@ class AgenteOnlineAEstrela:
 
             # EXIBIÇÃO EM TEMPO REAL AQUI
             if mostrar_passo_a_passo:
-                self.imprimir_estado_atual(delay)
+               self.imprimir_estado_atual(delay)
+            
 
             caminho_planejado, acoes_planejadas = self.planejar_com_a_estrela()
 

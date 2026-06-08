@@ -1,9 +1,10 @@
-import { ResultadoBusca } from "./resultados.js";
+import { ResultadoBusca, ResultadoBuscaOnline } from "./resultados.js";
 import { ResultadoHillClimbing } from "./resultados.js";
 import { ResultadoSimulatedAnnealing } from "./resultados.js";
 import { LabirintoBusca } from "./buscas.js";
 import { HillClimbing } from "./buscasLocais/hillClimbing.js";
 import { SimulatedAnnealing } from "./buscasLocais/simulatedAnnealing.js";
+import { AgenteOnlineAEstrela } from "./agenteOnline.js";
 
 const MAPAS = {
   labirinto_pequeno_uniforme: "../../mapas/labirinto_pequeno_uniforme.txt",
@@ -41,9 +42,6 @@ export async function executar() {
 
   const quantidadeExecucoes = parseInt(
     document.getElementById("qtdExecucoes").value,
-  );
-  console.log(
-    `labirinto: ${labirinto}, algoritmo: ${algoritmo}, execuções: ${quantidadeExecucoes}`,
   );
   const labirintoPath = await carregarMapa(MAPAS[labirinto]);
   const usarCustoVariado =
@@ -92,14 +90,22 @@ export async function executar() {
         fatorResfriamento,
         quantidadeExecucoes,
       );
-      resultado.plotarConvergencia()
+      resultado.plotarConvergencia();
       break;
 
+    case "Agente Online":
+      const agente = new AgenteOnlineAEstrela(labirintoObj);
+      resultado = agente.executar();
+      break;
     default:
       console.error("Algoritmo desconhecido");
   }
-
-  atualizarResultados(resultado);
+  console.log(resultado);
+  return
+  if (resultado instanceof ResultadoBuscaOnline) {
+  } else {
+    atualizarResultados(resultado);
+  }
 
   btn.querySelector(".spinner-border").style.display = "none";
   btn.querySelector(".spinner-label").style.display = "Executar";
@@ -115,7 +121,7 @@ function atualizarResultados(resultado) {
   const metricasBuscasLocais = document.getElementById(
     "metricas-buscas-locais",
   );
-
+  
   if (
     resultado instanceof ResultadoHillClimbing ||
     resultado instanceof ResultadoSimulatedAnnealing
@@ -123,6 +129,9 @@ function atualizarResultados(resultado) {
     atualizarResultadosBuscaLocal(resultado);
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "block";
+  } else if (resultado instanceof ResultadoBuscaOnline) {
+    metricasBuscasClassicas.style.display = "block";
+    metricasBuscasLocais.style.display = "none";
   } else {
     setResultadosBuscaClassica(resultado);
     metricasBuscasClassicas.style.display = "block";
