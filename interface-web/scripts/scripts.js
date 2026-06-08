@@ -109,69 +109,56 @@ export async function executar() {
 }
 
 function atualizarResultados(resultado) {
-  const metricasBuscasClassicas = document.getElementById(
-    "metricas-buscas-classicas",
-  );
-  const metricasBuscasLocais = document.getElementById(
-    "metricas-buscas-locais",
-  );
-
+  const metricasBuscasClassicas = document.getElementById("metricas-buscas-classicas");
+  const metricasBuscasLocais = document.getElementById("metricas-buscas-locais");
   const metricasBuscasOnline = document.getElementById("metricas-busca-online");
 
+  // Checagem para Buscas Locais
   if (
-    resultado instanceof ResultadoHillClimbing ||
-    resultado instanceof ResultadoSimulatedAnnealing
+    resultado.algoritmo === "Hill Climbing" ||
+    resultado.algoritmo === "SIMULATED ANNEALING"
   ) {
     atualizarResultadosBuscaLocal(resultado);
     metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "block";
-  }
-  if (resultado instanceof ResultadoBuscaOnline) {
+  } 
+  else if (resultado.algoritmo && resultado.algoritmo.includes("Online")) {
     exibirResultadoOnline(resultado);
     metricasBuscasOnline.style.display = "block";
     metricasBuscasClassicas.style.display = "none";
     metricasBuscasLocais.style.display = "none";
-  } else {
+  } 
+  // Se não for Local nem Online, é Busca Clássica
+  else {
     setResultadosBuscaClassica(resultado);
     metricasBuscasOnline.style.display = "none";
     metricasBuscasClassicas.style.display = "block";
     metricasBuscasLocais.style.display = "none";
   }
-
 }
 
 function atualizarResultadosBuscaLocal(resultado) {
-  document.getElementById("melhorCusto").textContent =
-    resultado.melhorCusto.toFixed(2);
+  // Blindado contra undefined e com valores padrão de segurança
+  document.getElementById("encontrado").textContent = resultado.encontrado ? "Sim" : "Não";
+  document.getElementById("execucoes").textContent = resultado.quantidadeExecucoes || 0;
+  document.getElementById("melhorCusto").textContent = (resultado.melhorCusto || 0).toFixed(1);
+  document.getElementById("piorCusto").textContent = (resultado.piorCusto || 0).toFixed(1);
+  document.getElementById("custoMedio").textContent = (resultado.custoMedio || 0).toFixed(4);
+  document.getElementById("tempoMedio").textContent = (resultado.tempoMedio || 0).toFixed(4) + "s";
+  document.getElementById("iteracoes").textContent = (resultado.iteracoesMedias || 0).toFixed(2);
+  document.getElementById("taxaSucesso").textContent = ((resultado.taxaSucesso || 0) * 100).toFixed(2) + "%";
+  document.getElementById("taxaMelhora").textContent = ((resultado.taxaMelhora || 0) * 100).toFixed(2) + "%";
+  document.getElementById("custoFinal").textContent = (resultado.custoTotal || 0).toFixed(1);
 
-  document.getElementById("piorCusto").textContent =
-    resultado.piorCusto.toFixed(2);
-
-  document.getElementById("custoMedio").textContent =
-    resultado.custoMedio.toFixed(2);
-
-  document.getElementById("tempoMedio").textContent =
-    resultado.tempoMedio.toFixed(4) + "s";
-
-  document.getElementById("iteracoes").textContent =
-    resultado.iteracoesMedias.toFixed(0);
-
-  document.getElementById("execucoes").textContent =
-    resultado.quantidadeExecucoes;
-
-  document.getElementById("taxaSucesso").textContent =
-    (resultado.taxaSucesso * 100).toFixed(2) + "%";
-
-  document.getElementById("taxaMelhora").textContent =
-    (resultado.taxaMelhora * 100).toFixed(2) + "%";
-
-  document.getElementById("custoFinal").textContent =
-    resultado.custoTotal.toFixed(2);
-
-  document.getElementById("encontrado").textContent = resultado.encontrado
-    ? "Sim"
-    : "Não";
+  const elOrdem = document.getElementById("melhorOrdem");
+  if (elOrdem) {
+    if (resultado.melhorSolucao && resultado.melhorSolucao.length > 0) {
+      elOrdem.textContent = "[" + resultado.melhorSolucao.map(coord => `(${coord[0]}, ${coord[1]})`).join(", ") + "]";
+    } else {
+      elOrdem.textContent = "Nenhuma coleta necessária";
+    }
+  }
 }
 
 function setResultadosBuscaClassica(resultado) {
@@ -312,5 +299,5 @@ function exibirResultadoOnline(resultado) {
     resultado.razaoOnlineOffline.toFixed(2);
 
   document.getElementById("tempoExecucao").textContent =
-    resultado.tempoExecucao.toFixed(4) + "s"; 
+    resultado.tempoExecucao.toFixed(4) + "s";
 }

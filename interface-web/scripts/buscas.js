@@ -481,24 +481,25 @@ export class LabirintoBusca {
     const custosFinais = [];
     const tempos = [];
     const iteracoes = [];
-
     const solucoes = [];
     const caminhosExplorados = [];
-    const historicos = []
+    const historicos = [];
 
     let melhoriasRegistradas = 0;
 
     for (let i = 0; i < quantidadeExecucoes; i++) {
       const hc = new HillClimbing(this);
-
       const resultado = hc.executar();
 
-      custosFinais.push(resultado.custoFinal);
-      tempos.push(resultado.tempoExecucao);
-      iteracoes.push(resultado.iteracoes);
-      solucoes.push(resultado.melhorSolucao);
-      caminhosExplorados.push(resultado.caminho);
-      historicos.push(resultado.historico)
+      // Caso 'custoFinal' não exista no arquivo retornado, usa 'melhorCusto'
+      const custoSeguro = resultado.custoFinal !== undefined ? resultado.custoFinal : resultado.melhorCusto;
+
+      custosFinais.push(custoSeguro);
+      tempos.push(resultado.tempoExecucao || 0);
+      iteracoes.push(resultado.iteracoes || 0);
+      solucoes.push(resultado.melhorSolucao || []);
+      caminhosExplorados.push(resultado.caminho || []);
+      historicos.push(resultado.historico || []);
 
       if (resultado.houveMelhora) {
         melhoriasRegistradas++;
@@ -506,8 +507,12 @@ export class LabirintoBusca {
     }
 
     const melhorCusto = Math.min(...custosFinais);
-    const indiceMelhor = custosFinais.indexOf(melhorCusto);
-    const historico = historicos[indiceMelhor]
+
+    // Proteção de índice para evitar travamento do renderizador do labirinto
+    let indiceMelhor = custosFinais.indexOf(melhorCusto);
+    if (indiceMelhor === -1) indiceMelhor = 0;
+
+    const historico = historicos[indiceMelhor];
 
     return new ResultadoHillClimbing({
       algoritmo: "Hill Climbing",
