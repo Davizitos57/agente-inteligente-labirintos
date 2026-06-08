@@ -62,7 +62,6 @@ A   #     #     #   #
 
 Após a adaptação, os mapas foram revisados manualmente para verificar se continuavam válidos, se preservavam os pontos de início e fim e se apresentavam mais de uma rota viável entre A e B. Com a existência de múltiplas rotas entre A e B, torna-se possível comparar de forma mais adequada as estratégias adotadas pelos algoritmos de busca, considerando aspectos como caminho encontrado, custo total, quantidade de nós explorados e tempo de execução.
 
-<br>
 
 ## Busca Local com Pontos de Coleta
 
@@ -91,8 +90,6 @@ A resposta gerada pela IA apresentou uma implementação funcional e compatível
 O principal ponto de correção esteve relacionado às métricas geradas ao final da execução do algoritmo, pois a estrutura retornada inicialmente não estava totalmente compatível com a classe *ResultadoBusca* utilizada no projeto. Além disso, durante a execução do algoritmo em um dos labirintos, observou-se que o histórico de custos armazenava apenas o melhor custo encontrado ao longo das iterações. Por esse motivo, o código foi alterado para que o histórico registrasse também a variação dos custos entre os vizinhos gerados e a solução atual.
 
 Por fim, a partir do código inicialmente gerado, foram realizadas alterações e inclusões de novas métricas que estavam ausentes ou eram calculadas de forma inadequada em relação ao enunciado do trabalho. Dessa forma, a IA foi utilizada como ferramenta de apoio ao desenvolvimento, enquanto a validação, adaptação e correção da solução foram realizadas manualmente conforme os critérios definidos para o projeto.
-
-
 
 ### Hill-Climbing
 
@@ -123,6 +120,20 @@ A princípio, os resultados da IA foram válidos de acordo com a demanda e funci
 Após uma série de correções e alinhamentos entre o que estava sendo desenvolvido e o que era esperado de acordo com os requisitos do trabalho, foi atingida uma versão estável e coerente do algoritmo de Hill-Climbing.
 
 Versão essa que consiste em uma variação denominada "Steepest-Ascent" (ou Descida Mais Íngreme): avalia todos os vizinhos possíveis, depois de mapear tudo em volta, avança exatamente na direção que desce mais rápido.
+
+## Busca Online no Labirinto Desconhecido
+ 
+### Agente online 
+
+Para o desenvolvimento do agente online, foi utilizado o auxílio da IA com o objetivo de adaptar a lógica dos algoritmos de busca já implementados no projeto para um cenário em que o labirinto não é totalmente conhecido desde o início. O uso da IA teve como foco auxiliar na construção de uma primeira versão do algoritmo, considerando a estrutura do arquivo *buscas.py*, a classe *ResultadoBusca* e os requisitos definidos no enunciado do trabalho.
+
+A resposta gerada serviu como base inicial para organizar a ideia de um agente capaz de manter um mapa interno desconhecido e atualizá-lo conforme avançava pelo labirinto. Apesar de a estrutura inicial gerada pela IA ter sido útil, foram necessários ajustes manuais para adequar o código ao funcionamento real do projeto, corrigir incompatibilidades e garantir que o agente utilizasse apenas as células já conhecidas ou reveladas durante a exploração.
+
+Entre as principais modificações realizadas durante as manutenções manuais, destacam-se a integração com a classe *LabirintoBusca*, a compatibilidade com a estrutura *ResultadoBusca*, o controle das células reveladas, o registro de replanejamentos e a contagem de células revisitadas. Após essas correções, foram realizados testes em diferentes mapas para verificar se o agente conseguia sair de *A* e alcançar *B*, além de validar se as métricas retornadas estavam coerentes com o comportamento observado.
+
+Dessa forma, a IA foi utilizada como ferramenta de apoio para acelerar a criação da base do algoritmo, enquanto a validação, adaptação e correção final da solução foram realizadas manualmente pelo grupo.
+
+---
 
 ### Interface WEB
 
