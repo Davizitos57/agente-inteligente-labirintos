@@ -27,7 +27,7 @@ export class AgenteOnlineAEstrela {
     this.acoesExecutadas = [];
 
     this.contagemVisitas = new Map();
-   this.contagemVisitas.set(this.key(this.inicio), 1);
+    this.contagemVisitas.set(this.key(this.inicio), 1);
 
     this.movimentos = 0;
     this.custoReal = 0;
@@ -185,8 +185,8 @@ export class AgenteOnlineAEstrela {
 
   heuristica(estado) {
     return (
-      Math.abs(estado.estado[0] - this.objetivo[0]) +
-      Math.abs(estado.estado[1] - this.objetivo[1])
+      Math.abs(estado[0] - this.objetivo[0]) +
+      Math.abs(estado[1] - this.objetivo[1])
     );
   }
 
@@ -281,10 +281,7 @@ export class AgenteOnlineAEstrela {
   planejarComAEstrela() {
     let contador = 0;
 
-    const inicio = new No({
-      estado: this.posicaoAtual,
-      g: 0.0,
-    });
+    const inicio = new No(this.posicaoAtual, null, null, 0.0);
 
     const fronteira = [];
 
@@ -310,7 +307,7 @@ export class AgenteOnlineAEstrela {
 
       const atual = fronteira.shift();
       const no = atual.no;
-      
+
       const chaveEstado = this.key(no.estado);
 
       if (fechados.has(chaveEstado)) {
@@ -322,7 +319,7 @@ export class AgenteOnlineAEstrela {
       }
 
       fechados.add(chaveEstado);
-      
+
       for (const [acao, estado, custo] of this.vizinhosMapaInterno(no.estado)) {
         const chaveVizinho = this.key(estado);
 
@@ -335,12 +332,7 @@ export class AgenteOnlineAEstrela {
         const melhorAtual = melhorG.get(chaveVizinho) ?? Infinity;
 
         if (novoG < melhorAtual) {
-          const filho = new No({
-            estado,
-            pai: no,
-            acao,
-            g: novoG,
-          });
+          const filho = new No(estado, no, acao, novoG);
 
           melhorG.set(chaveVizinho, novoG);
 
@@ -380,7 +372,7 @@ export class AgenteOnlineAEstrela {
 }
 
   vizinhosMapaInterno(estado) {
-    const [linha, coluna] = estado.estado;
+    const [linha, coluna] = estado;
     
     const candidatos = [
         ["cima", [linha - 1, coluna]],
