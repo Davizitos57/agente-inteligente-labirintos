@@ -1,0 +1,7 @@
+Algoritmo;Labirinto;Tipo_Mapa;Sucesso;Movimentos;Custo_Real;Celulas_Reveladas;Celulas_Revisitadas;Replanejamentos;Tamanho_Caminho;Custo_Otimo_Offline;Razao_Online_Offline;Tempo_Execucao
+Busca Online com Replanning A*;Pequeno;Uniforme;Sim;52;52.0;127;5;52;52;38.0;1.3684;8.2925
+Busca Online com Replanning A*;Pequeno;Variado;Sim;68;152.0;175;3;68;68;86.0;1.7674;11.4156
+Busca Online com Replanning A*;Medio;Uniforme;Sim;186;186.0;407;24;186;186;106.0;1.7547;30.3021
+Busca Online com Replanning A*;Medio;Variado;Sim;176;417.0;384;25;176;176;237.0;1.7595;28.7969
+Busca Online com Replanning A*;Grande;Uniforme;Sim;650;650.0;1123;189;650;650;170.0;3.8235;107.9823
+Busca Online com Replanning A*;Grande;Variado;Sim;492;1005.0;931;117;492;492;365.0;2.7534;82.3312

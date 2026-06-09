@@ -1,0 +1,7 @@
+Algoritmo;Labirinto;Numero_Execucoes;Sucesso;Melhor_Custo;Pior_Custo;Custo_Medio;Tempo_Medio;Iteracoes_Medias;Taxa_Sucesso;Taxa_Melhora
+Hill Climbing;Pequeno;10;Sim;156.0;156.0;156.0000;0.0040;110.70;100.00%;93.00%
+Hill Climbing;Pequeno;100;Sim;156.0;156.0;156.0000;0.0038;109.25;100.00%;93.00%
+Hill Climbing;Medio;10;Sim;634.0;820.0;693.9000;0.0956;169.00;100.00%;100.00%
+Hill Climbing;Medio;100;Sim;634.0;832.0;690.0600;0.0971;161.71;100.00%;100.00%
+Hill Climbing;Grande;10;Sim;1072.0;1345.0;1194.5000;0.4614;263.10;100.00%;100.00%
+Hill Climbing;Grande;100;Sim;1072.0;1466.0;1260.5500;0.4857;250.58;100.00%;100.00%

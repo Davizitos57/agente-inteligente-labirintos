@@ -1,0 +1,7 @@
+Algoritmo;Labirinto;Sucesso;Numero_Execucoes;Melhor_Custo;Pior_Custo;Custo_Medio;Tempo_Medio;Iteracoes_Medias;Temperatura_Inicial;Temperatura_Final;Fator_Resfriamento;Houve_Melhora
+Simulated Annealing;Pequeno;Sim;10;156;255;176.89;0.000;71;1000.0;0.01;0.85;100%
+Simulated Annealing;Medio;Sim;10;635;1253;813.17;0.054;71;1000.0;0.01;0.85;100%
+Simulated Annealing;Grande;Sim;10;1281;2591;1756.48;0.023;71;1000.0;0.01;0.85;100%
+Simulated Annealing;Pequeno;Sim;156;255;176.89;0.000;71;1000.0;0.01;0.85;100%
+Simulated Annealing;Medio;Sim;635;1253;813.17;0.054;71;1000.0;0.01;0.85;100%
+Simulated Annealing;Grande;Sim;1281;2591;1756.48;0.023;71;1000.0;0.01;0.85;100%
